@@ -389,7 +389,2786 @@ h3.sub {
 </style>
 </head>
 <body>
+<pre>
+  import 'dart:convert';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'RapidAid',
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Color(0xFF0D0D0D),
+        primaryColor: Color(0xFFE8192C),
+      ),
+      home: LoginPage(), 
+    );
+  }
+}
+
+String serverUrl    = "http://192.168.33.1:80/MCA_HACK_BACKEND";
+String loginUrl     = "http://192.168.33.1/MCA_HACK_BACKEND/u_login.php";    // REAL PHP API
+String registerUrl  = "http://192.168.33.1/MCA_HACK_BACKEND/register.php"; // REAL PHP API
+
+
+String myName     = "";
+String myUserId   = "";
+String myUserType = "";
+
+
+// fake data for the user dashboard
+Map<String, dynamic> fakeUserData = {
+  "name"             : "Aarav Sharma",
+  "email"            : "aarav@example.com",
+  "phone"            : "+91 98765 43210",
+  "blood_group"      : "B+",
+  "existing_diseases": "Diabetes, Hypertension",
+  "allergies"        : "Penicillin",
+  "reports_notes"    : "Regular checkup done in Jan 2025",
+};
+
+// fake data for the hospital patients list
+List<Map<String, dynamic>> fakePatientsList = [
+  {
+    "id"               : "101",
+    "patient_name"     : "Aarav Sharma",
+    "emergency_type"   : "critical",
+    "blood_group"      : "B+",
+    "existing_diseases": "Diabetes, Hypertension",
+    "allergies"        : "Penicillin",
+    "reports_notes"    : "Chest pain since 2 hours",
+    "pickup_location"  : "Sector 17, Ahmedabad",
+    "driver_name"      : "Ramesh Kumar",
+    "arrival_time"     : "Arriving in 8 minutes",
+    "status"           : "En Route",
+  },
+  {
+    "id"               : "102",
+    "patient_name"     : "Priya Mehta",
+    "emergency_type"   : "standard",
+    "blood_group"      : "O+",
+    "existing_diseases": "None",
+    "allergies"        : "None",
+    "reports_notes"    : "Fell down stairs. Ankle injury.",
+    "pickup_location"  : "Navrangpura, Ahmedabad",
+    "driver_name"      : "Sunil Patil",
+    "arrival_time"     : "Arriving in 14 minutes",
+    "status"           : "On the Way",
+  },
+];
+
+// fake data for the incoming emergency request
+// the driver sees this when they go online
+Map<String, dynamic> fakeEmergencyRequest = {
+  "emergency_id"     : "101",
+  "patient_name"     : "Aarav Sharma",
+  "emergency_type"   : "Critical",
+  "location"         : "Sector 17, Ahmedabad",
+  "distance"         : "2.3 km away",
+  "blood_group"      : "B+",
+  "existing_diseases": "Diabetes, Hypertension",
+  "allergies"        : "Penicillin",
+  "reports_notes"    : "Chest pain since 2 hours",
+};
+
+// fake list of hospitals the driver can choose from
+List<Map<String, String>> fakeHospitalsList = [
+  {"id": "1", "name": "City General Hospital", "distance": "1.2 km"},
+  {"id": "2", "name": "Apollo Hospital",        "distance": "2.5 km"},
+  {"id": "3", "name": "Sola Civil Hospital",    "distance": "3.1 km"},
+  {"id": "4", "name": "Sterling Hospital",      "distance": "4.0 km"},
+];
+
+// fake hospital stats for the dashboard
+Map<String, dynamic> fakeHospitalStats = {
+  "active_requests" : "3",
+  "drivers_online"  : "7",
+  "trips_today"     : "14",
+  "avg_response"    : "4.2m",
+};
+
+// fake recent requests for hospital
+List<Map<String, String>> fakeRecentRequests = [
+  {"name": "Raj Kumar",  "type": "Critical", "time": "2 min ago",  "status": "Active"},
+  {"name": "Priya M.",   "type": "Standard", "time": "8 min ago",  "status": "En Route"},
+  {"name": "Suresh V.",  "type": "Standard", "time": "22 min ago", "status": "Done"},
+];
+
+Map<String, String> fakeDriverStats = {
+  "trips"    : "6",
+  "distance" : "38 km",
+  "rating"   : "4.8",
+};
+
+
+class MyBox extends StatefulWidget {
+  String label;
+  TextEditingController controller;
+  bool isPassword;
+  IconData? icon;
+
+  MyBox({
+    required this.label,
+    required this.controller,
+    this.isPassword = false,
+    this.icon,
+  });
+
+  @override
+  State<MyBox> createState() => _MyBoxState();
+}
+
+class _MyBoxState extends State<MyBox> {
+  bool hideText = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: widget.controller,
+      obscureText: widget.isPassword ? hideText : false,
+      style: TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecoration(
+        labelText: widget.label,
+        labelStyle: TextStyle(color: Color(0xFF888888)),
+        prefixIcon: widget.icon != null
+            ? Icon(widget.icon, color: Color(0xFF888888), size: 20)
+            : null,
+        suffixIcon: widget.isPassword
+            ? IconButton(
+                icon: Icon(
+                  hideText ? Icons.visibility_off : Icons.visibility,
+                  color: Color(0xFF888888),
+                  size: 18,
+                ),
+                onPressed: () {
+                  setState(() {
+                    hideText = !hideText;
+                  });
+                },
+              )
+            : null,
+        filled: true,
+        fillColor: Color(0xFF1A1A1A),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Color(0xFF333333)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Color(0xFF333333)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Color(0xFFE8192C), width: 1.5),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// STEP 7 - A SIMPLE RED BUTTON WIDGET
+// we use this everywhere for buttons
+// ==========================================
+class MyRedButton extends StatelessWidget {
+  String text;
+  VoidCallback? onTap;
+  bool isLoading;
+  Color? buttonColor;
+
+  MyRedButton({
+    required this.text,
+    required this.onTap,
+    this.isLoading = false,
+    this.buttonColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: buttonColor ?? Color(0xFFE8192C),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: isLoading
+            ? SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              )
+            : Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// LOGIN PAGE
+// this calls the REAL PHP login api
+// ==========================================
+class LoginPage extends StatefulWidget {
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+
+  // these hold what the user types
+  TextEditingController usernameBox = TextEditingController();
+  TextEditingController passwordBox = TextEditingController();
+
+  // this shows the spinning circle
+  bool isLoading = false;
+
+  // this function runs when you tap Login
+  void tapLogin() async {
+
+    // check if boxes are empty
+    if (usernameBox.text.trim().isEmpty) {
+      showRedMessage("Please type your username");
+      return;
+    }
+    if (passwordBox.text.isEmpty) {
+      showRedMessage("Please type your password");
+      return;
+    }
+
+    // show the spinning circle
+    setState(() {
+      isLoading = true;
+    });
+
+    // ---- REAL PHP API CALL ----
+    // we send username and password to the server
+    // the server checks if it is correct
+    try {
+      var serverResponse = await http.post(
+        Uri.parse(loginUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "username": usernameBox.text.trim(),
+          "password": passwordBox.text,
+        }),
+      );
+
+      
+      var responseData = jsonDecode(serverResponse.body);
+
+      if (serverResponse.statusCode == 200) {
+        myName     = usernameBox.text.trim();
+        myUserId   = responseData["user_id"].toString();
+        myUserType = responseData["user_type"].toString();
+        if (responseData["user_type"] == "User") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => UserHomePage()),
+          );
+
+        } else if (responseData["user_type"] == "Hospital") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HospitalHomePage()),
+          );
+
+        } else if (responseData["user_type"] == "Driver") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => DriverHomePage()),
+          );
+
+        } else {
+          showRedMessage("Unknown user type from server");
+        }
+
+      } else {
+        // login failed
+        showRedMessage(responseData["message"] ?? "Login failed. Try again.");
+      }
+
+    } catch (error) {
+      // cant reach server
+      showRedMessage("Cannot connect to server. Check wifi.");
+    }
+
+    // hide the spinning circle
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  // this shows a red message at the bottom of the screen
+  void showRedMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Color(0xFFB5001F),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+
+          // decorative circle in top right corner
+          Positioned(
+            top: -60,
+            right: -60,
+            child: Container(
+              width: 240,
+              height: 240,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0xFFE8192C).withOpacity(0.10),
+              ),
+            ),
+          ),
+
+          // the actual content
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(26),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  SizedBox(height: 40),
+
+                  // app logo box
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFE8192C),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(Icons.local_hospital, color: Colors.white, size: 30),
+                  ),
+
+                  SizedBox(height: 20),
+
+                  // app name
+                  Text(
+                    "RapidAid",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -1,
+                    ),
+                  ),
+
+                  SizedBox(height: 4),
+
+                  Text(
+                    "Emergency ambulance service",
+                    style: TextStyle(color: Color(0xFF888888), fontSize: 14),
+                  ),
+
+                  SizedBox(height: 44),
+
+                  Text(
+                    "Sign In",
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+
+                  SizedBox(height: 18),
+
+                  // username box
+                  MyBox(
+                    label: "Username",
+                    controller: usernameBox,
+                    icon: Icons.person_outline,
+                  ),
+
+                  SizedBox(height: 14),
+
+                  // password box
+                  MyBox(
+                    label: "Password",
+                    controller: passwordBox,
+                    isPassword: true,
+                    icon: Icons.lock_outline,
+                  ),
+
+                  SizedBox(height: 24),
+
+                  // login button
+                  MyRedButton(
+                    text: "Login",
+                    onTap: tapLogin,
+                    isLoading: isLoading,
+                  ),
+
+                  SizedBox(height: 18),
+
+                  // go to signup
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignupPage()),
+                        );
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Don't have account? ",
+                          style: TextStyle(color: Color(0xFF888888), fontSize: 14),
+                          children: [
+                            TextSpan(
+                              text: "Sign Up",
+                              style: TextStyle(
+                                color: Color(0xFFE8192C),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// SIGNUP PAGE
+// this calls the REAL PHP register api
+// ==========================================
+class SignupPage extends StatefulWidget {
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+
+  // text boxes for common fields
+  TextEditingController nameBox     = TextEditingController();
+  TextEditingController emailBox    = TextEditingController();
+  TextEditingController phoneBox    = TextEditingController();
+  TextEditingController passwordBox = TextEditingController();
+
+  // extra boxes for driver
+  TextEditingController licenseBox = TextEditingController();
+  TextEditingController vehicleBox = TextEditingController();
+
+  // extra boxes for hospital
+  TextEditingController hospNameBox    = TextEditingController();
+  TextEditingController imrBox         = TextEditingController();
+  TextEditingController hospLocationBox = TextEditingController();
+  TextEditingController hospContactBox = TextEditingController();
+
+  // which type is selected  0=User  1=Driver  2=Hospital
+  int selectedType = 0;
+  List<String> typeNames = ["User", "Driver", "Hospital"];
+
+  bool isLoading = false;
+
+  // this runs when you tap Create Account
+  void tapSignup() async {
+
+    // check if basic boxes are empty
+    if (nameBox.text.trim().isEmpty ||
+        emailBox.text.trim().isEmpty ||
+        phoneBox.text.trim().isEmpty ||
+        passwordBox.text.isEmpty) {
+      showRedMessage("Please fill all the fields");
+      return;
+    }
+
+    if (passwordBox.text.length < 6) {
+      showRedMessage("Password must be at least 6 characters");
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    // build the data we want to send
+    Map<String, String> dataToSend = {
+      "name"      : nameBox.text.trim(),
+      "email"     : emailBox.text.trim(),
+      "phone"     : phoneBox.text.trim(),
+      "password"  : passwordBox.text,
+      "user_type" : typeNames[selectedType],
+    };
+
+    // add driver extra fields
+    if (selectedType == 1) {
+      dataToSend["license_no"] = licenseBox.text.trim();
+      dataToSend["vehicle_no"] = vehicleBox.text.trim();
+    }
+
+    // add hospital extra fields
+    if (selectedType == 2) {
+      dataToSend["hospital_name"] = hospNameBox.text.trim();
+      dataToSend["imr_no"]        = imrBox.text.trim();
+      dataToSend["location"]      = hospLocationBox.text.trim();
+      dataToSend["contact_no"]    = hospContactBox.text.trim();
+    }
+
+    // ---- REAL PHP API CALL ----
+    try {
+      var serverResponse = await http.post(
+        Uri.parse(registerUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(dataToSend),
+      );
+
+      var responseData = jsonDecode(serverResponse.body);
+
+      if (serverResponse.statusCode == 200 || serverResponse.statusCode == 201) {
+        // account created!
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Account created! Please login now."),
+            backgroundColor: Color(0xFF00C853),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        Navigator.pop(context); // go back to login page
+
+      } else {
+        showRedMessage(responseData["message"] ?? "Registration failed. Try again.");
+      }
+
+    } catch (error) {
+      showRedMessage("Cannot connect to server. Check wifi.");
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void showRedMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Color(0xFFB5001F),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xFF0D0D0D),
+        title: Text("Create Account", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            // select type row
+            Text("I am a...", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+            SizedBox(height: 10),
+
+            Row(
+              children: [
+
+                // User button
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () { setState(() { selectedType = 0; }); },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 11),
+                      margin: EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: selectedType == 0 ? Color(0xFFE8192C) : Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: selectedType == 0 ? Color(0xFFE8192C) : Color(0xFF333333),
+                        ),
+                      ),
+                      child: Text(
+                        "User",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: selectedType == 0 ? Colors.white : Color(0xFF888888),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Driver button
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () { setState(() { selectedType = 1; }); },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 11),
+                      margin: EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: selectedType == 1 ? Color(0xFFE8192C) : Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: selectedType == 1 ? Color(0xFFE8192C) : Color(0xFF333333),
+                        ),
+                      ),
+                      child: Text(
+                        "Driver",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: selectedType == 1 ? Colors.white : Color(0xFF888888),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Hospital button
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () { setState(() { selectedType = 2; }); },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 11),
+                      decoration: BoxDecoration(
+                        color: selectedType == 2 ? Color(0xFFE8192C) : Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: selectedType == 2 ? Color(0xFFE8192C) : Color(0xFF333333),
+                        ),
+                      ),
+                      child: Text(
+                        "Hospital",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: selectedType == 2 ? Colors.white : Color(0xFF888888),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+              ],
+            ),
+
+            SizedBox(height: 22),
+
+            // common fields everyone needs
+            MyBox(label: "Full Name",     controller: nameBox,     icon: Icons.person_outline),
+            SizedBox(height: 13),
+            MyBox(label: "Email",         controller: emailBox,    icon: Icons.email_outlined),
+            SizedBox(height: 13),
+            MyBox(label: "Phone Number",  controller: phoneBox,    icon: Icons.phone_outlined),
+            SizedBox(height: 13),
+            MyBox(label: "Password",      controller: passwordBox, icon: Icons.lock_outline, isPassword: true),
+
+            // show these only if Driver is selected
+            if (selectedType == 1) ...[
+              SizedBox(height: 13),
+              MyBox(label: "License Number", controller: licenseBox, icon: Icons.badge_outlined),
+              SizedBox(height: 13),
+              MyBox(label: "Vehicle Number", controller: vehicleBox, icon: Icons.local_shipping_outlined),
+            ],
+
+            // show these only if Hospital is selected
+            if (selectedType == 2) ...[
+              SizedBox(height: 13),
+              MyBox(label: "Hospital Name",     controller: hospNameBox,     icon: Icons.local_hospital_outlined),
+              SizedBox(height: 13),
+              MyBox(label: "IMR Number",        controller: imrBox,          icon: Icons.numbers_outlined),
+              SizedBox(height: 13),
+              MyBox(label: "Hospital Location", controller: hospLocationBox, icon: Icons.location_on_outlined),
+              SizedBox(height: 13),
+              MyBox(label: "Contact Number",    controller: hospContactBox,  icon: Icons.phone_outlined),
+            ],
+
+            SizedBox(height: 28),
+
+            // create account button
+            MyRedButton(
+              text: "Create Account",
+              onTap: tapSignup,
+              isLoading: isLoading,
+            ),
+
+            SizedBox(height: 20),
+
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// USER HOME PAGE
+// has 2 tabs - Home and Profile
+// ==========================================
+class UserHomePage extends StatefulWidget {
+  @override
+  State<UserHomePage> createState() => _UserHomePageState();
+}
+
+class _UserHomePageState extends State<UserHomePage> {
+
+  int activeTab = 0; // 0 = home tab  1 = profile tab
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+
+      // show home or profile based on activeTab
+      body: activeTab == 0 ? UserHomeTab() : UserProfileTab(),
+
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Color(0xFF1A1A1A),
+        currentIndex: activeTab,
+        onTap: (tappedIndex) {
+          setState(() {
+            activeTab = tappedIndex;
+          });
+        },
+        selectedItemColor: Color(0xFFE8192C),
+        unselectedItemColor: Color(0xFF888888),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),   label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline),  label: "Profile"),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// USER HOME TAB
+// shows the call ambulance button
+// uses fakeUserData for the greeting
+// ==========================================
+class UserHomeTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              // greeting row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Hello,",
+                        style: TextStyle(color: Color(0xFF888888), fontSize: 13),
+                      ),
+                      Text(
+                        myName.isNotEmpty ? myName : fakeUserData["name"],
+                        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1A1A1A),
+                      borderRadius: BorderRadius.circular(11),
+                      border: Border.all(color: Color(0xFF333333)),
+                    ),
+                    child: Icon(Icons.notifications_outlined, color: Colors.white, size: 20),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 26),
+
+              // big red call ambulance card
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFE8192C), Color(0xFF8B0000)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFFE8192C).withOpacity(0.3),
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Need Help?",
+                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      "Call an ambulance right now",
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                    SizedBox(height: 18),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ChooseEmergencyPage()),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.emergency, color: Color(0xFFE8192C), size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              "Call Ambulance",
+                              style: TextStyle(
+                                color: Color(0xFFE8192C),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 24),
+
+              // how it works section
+              Text(
+                "How It Works",
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+
+              SizedBox(height: 14),
+
+              buildStep("Step 1", "Choose emergency type",     Icons.touch_app_outlined),
+              SizedBox(height: 10),
+              buildStep("Step 2", "Confirm your request",      Icons.check_circle_outline),
+              SizedBox(height: 10),
+              buildStep("Step 3", "Nearest driver is assigned", Icons.local_taxi_outlined),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // helper to build one step card
+  Widget buildStep(String stepTitle, String description, IconData icon) {
+    return Container(
+      padding: EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xFF2A2A2A)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Color(0xFFE8192C).withOpacity(0.15),
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: Icon(icon, color: Color(0xFFE8192C), size: 18),
+          ),
+          SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(stepTitle,   style: TextStyle(color: Color(0xFFE8192C), fontSize: 11, fontWeight: FontWeight.bold)),
+                Text(description, style: TextStyle(color: Colors.white, fontSize: 13)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+class UserProfileTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Text(
+                "My Profile",
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+
+              SizedBox(height: 26),
+
+              // profile picture circle
+              Center(
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF1A1A1A),
+                    border: Border.all(color: Color(0xFFE8192C), width: 2.5),
+                  ),
+                  child: Icon(Icons.person, color: Color(0xFF888888), size: 46),
+                ),
+              ),
+
+              SizedBox(height: 10),
+              Center(
+                child: Text(
+                  fakeUserData["name"],
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Center(
+                child: Text("User", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+              ),
+
+              SizedBox(height: 26),
+
+              Text("Personal Details", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              SizedBox(height: 14),
+
+              buildInfoRow(Icons.person_outline,  "Name",  fakeUserData["name"]),
+              SizedBox(height: 10),
+              buildInfoRow(Icons.email_outlined,  "Email", fakeUserData["email"]),
+              SizedBox(height: 10),
+              buildInfoRow(Icons.phone_outlined,  "Phone", fakeUserData["phone"]),
+
+              SizedBox(height: 26),
+
+              Text("Medical Information", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text(
+                "This info is shared with the hospital when you call ambulance",
+                style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+              ),
+              SizedBox(height: 14),
+
+              buildInfoRow(Icons.bloodtype_outlined,      "Blood Group",       fakeUserData["blood_group"]),
+              SizedBox(height: 10),
+              buildInfoRow(Icons.sick_outlined,           "Existing Diseases", fakeUserData["existing_diseases"]),
+              SizedBox(height: 10),
+              buildInfoRow(Icons.warning_amber_outlined,  "Allergies",         fakeUserData["allergies"]),
+              SizedBox(height: 10),
+              buildInfoRow(Icons.note_outlined,           "Reports / Notes",   fakeUserData["reports_notes"]),
+
+              SizedBox(height: 28),
+
+              Divider(color: Color(0xFF2A2A2A)),
+              SizedBox(height: 14),
+
+              // logout button
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE8192C).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Color(0xFFE8192C).withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Color(0xFFE8192C), size: 20),
+                      SizedBox(width: 12),
+                      Text("Logout", style: TextStyle(color: Color(0xFFE8192C), fontWeight: FontWeight.bold)),
+                      Spacer(),
+                      Icon(Icons.arrow_forward_ios, color: Color(0xFFE8192C), size: 13),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // helper to show one info row
+  Widget buildInfoRow(IconData icon, String label, String value) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+      decoration: BoxDecoration(
+        color: Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xFF2A2A2A)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Color(0xFF888888), size: 18),
+          SizedBox(width: 12),
+          Text(label, style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+          Spacer(),
+          Flexible(
+            child: Text(
+              value,
+              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// CHOOSE EMERGENCY PAGE
+// user picks critical or standard
+// uses no api - just navigates
+// ==========================================
+class ChooseEmergencyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF0D0D0D),
+        title: Text("Request Ambulance", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            Text(
+              "Select Emergency Type",
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 6),
+            Text(
+              "How serious is the emergency?",
+              style: TextStyle(color: Color(0xFF888888), fontSize: 13),
+            ),
+
+            SizedBox(height: 32),
+
+            // Critical card
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ConfirmEmergencyPage(isCritical: true)),
+                );
+              },
+              child: buildEmergencyCard(
+                title: "Critical Emergency",
+                description: "Life threatening\nAll nearby drivers are alerted at once",
+                icon: Icons.warning_rounded,
+                cardColor: Color(0xFFE8192C),
+                eta: "ETA < 5 min",
+              ),
+            ),
+
+            SizedBox(height: 16),
+
+            // Standard card
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ConfirmEmergencyPage(isCritical: false)),
+                );
+              },
+              child: buildEmergencyCard(
+                title: "Standard Ambulance",
+                description: "Stable but needs medical help\nNearest driver is assigned",
+                icon: Icons.local_hospital_outlined,
+                cardColor: Color(0xFFFF6D00),
+                eta: "ETA < 15 min",
+              ),
+            ),
+
+            Spacer(),
+
+            // info box at bottom
+            Container(
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Color(0xFF1A1A1A),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Color(0xFF2A2A2A)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Color(0xFF888888), size: 17),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      "For Critical emergencies all drivers within 5km are notified.",
+                      style: TextStyle(color: Color(0xFF888888), fontSize: 12, height: 1.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildEmergencyCard({
+    required String title,
+    required String description,
+    required IconData icon,
+    required Color cardColor,
+    required String eta,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: cardColor.withOpacity(0.4), width: 1.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: cardColor.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: Icon(icon, color: cardColor, size: 26),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                SizedBox(height: 4),
+                Text(description, style: TextStyle(color: Color(0xFF888888), fontSize: 12, height: 1.4)),
+              ],
+            ),
+          ),
+          Column(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: cardColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                child: Text(eta, style: TextStyle(color: cardColor, fontSize: 11, fontWeight: FontWeight.bold)),
+              ),
+              SizedBox(height: 8),
+              Icon(Icons.arrow_forward_ios, color: Color(0xFF888888), size: 13),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// CONFIRM EMERGENCY PAGE
+// shows summary before sending
+// uses fakeUserData for patient details
+// ==========================================
+class ConfirmEmergencyPage extends StatelessWidget {
+  bool isCritical;
+  ConfirmEmergencyPage({required this.isCritical});
+
+  @override
+  Widget build(BuildContext context) {
+
+    Color theColor = isCritical ? Color(0xFFE8192C) : Color(0xFFFF6D00);
+    String theLabel = isCritical ? "Critical Emergency" : "Standard Ambulance";
+
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF0D0D0D),
+        title: Text("Confirm Request", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(22),
+        child: Column(
+          children: [
+
+            // type card at top
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: theColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: theColor.withOpacity(0.4), width: 1.5),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    isCritical ? Icons.warning_rounded : Icons.local_hospital_outlined,
+                    color: theColor,
+                    size: 44,
+                  ),
+                  SizedBox(height: 10),
+                  Text(theLabel, style: TextStyle(color: theColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 6),
+                  Text(
+                    isCritical
+                        ? "All nearby drivers will be alerted"
+                        : "The nearest driver will be assigned",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 22),
+
+            buildDetailRow(Icons.location_on_outlined, "Location", "Detected from your phone"),
+            SizedBox(height: 10),
+            buildDetailRow(Icons.bloodtype_outlined,   "Blood Group",  fakeUserData["blood_group"]),
+            SizedBox(height: 10),
+            buildDetailRow(Icons.sick_outlined,        "Diseases",     fakeUserData["existing_diseases"]),
+            SizedBox(height: 10),
+            buildDetailRow(Icons.timer_outlined,       "Expected ETA", isCritical ? "Less than 5 minutes" : "Less than 15 minutes"),
+
+            Spacer(),
+
+            // confirm button
+            MyRedButton(
+              text: "Yes, Send Emergency Request",
+              buttonColor: theColor,
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EmergencyWaitingPage(isCritical: isCritical),
+                  ),
+                );
+              },
+            ),
+
+            SizedBox(height: 12),
+
+            // cancel button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton(
+                onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Color(0xFF333333)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text("Cancel", style: TextStyle(color: Color(0xFF888888))),
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildDetailRow(IconData icon, String label, String value) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+      decoration: BoxDecoration(
+        color: Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xFF2A2A2A)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Color(0xFF888888), size: 17),
+          SizedBox(width: 12),
+          Text(label, style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+          Spacer(),
+          Flexible(
+            child: Text(
+              value,
+              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// EMERGENCY WAITING PAGE
+// shows spinning animation + 2 min timer
+// uses fake data to simulate driver found
+// no api calls here - all fake
+// ==========================================
+class EmergencyWaitingPage extends StatefulWidget {
+  bool isCritical;
+  EmergencyWaitingPage({required this.isCritical});
+
+  @override
+  State<EmergencyWaitingPage> createState() => _EmergencyWaitingPageState();
+}
+
+class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with SingleTickerProviderStateMixin {
+
+  int secondsLeft = 120;
+  Timer? myTimer;
+  String statusMessage = "Sending emergency request...";
+  bool driverWasFound = false;
+  String driverName = "";
+
+  late AnimationController pulseCtrl;
+  late Animation<double> pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // setup the pulsing animation
+    pulseCtrl = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 900),
+    );
+    pulseCtrl.repeat(reverse: true);
+    pulseAnim = Tween<double>(begin: 0.92, end: 1.08).animate(pulseCtrl);
+
+    // start the countdown timer
+    startTimer();
+
+    // simulate finding a driver after 6 seconds
+    simulateFindingDriver();
+  }
+
+  void startTimer() {
+    myTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      if (secondsLeft <= 0) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        secondsLeft = secondsLeft - 1;
+      });
+    });
+  }
+
+  void simulateFindingDriver() async {
+    // wait 2 seconds then show searching message
+    await Future.delayed(Duration(seconds: 2));
+    if (!mounted) return;
+    setState(() { statusMessage = "Notifying nearby drivers..."; });
+
+    // wait 3 more seconds then show expanding message
+    await Future.delayed(Duration(seconds: 3));
+    if (!mounted) return;
+    setState(() { statusMessage = "Round 1: Looking for drivers within 2km..."; });
+
+    // wait 4 more seconds then driver is found!
+    await Future.delayed(Duration(seconds: 4));
+    if (!mounted) return;
+
+    // driver found! use fake data
+    myTimer?.cancel();
+    pulseCtrl.stop();
+    setState(() {
+      driverWasFound = true;
+      driverName     = "Ramesh Kumar";
+      statusMessage  = "Driver is on the way!";
+    });
+  }
+
+  @override
+  void dispose() {
+    myTimer?.cancel();
+    pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  // turns 75 seconds into "01:15" format
+  String getTimerText() {
+    int minutes = secondsLeft ~/ 60;
+    int seconds = secondsLeft % 60;
+    String mText = minutes.toString().padLeft(2, "0");
+    String sText = seconds.toString().padLeft(2, "0");
+    return "$mText:$sText";
+  }
+
+  Color get mainColor => widget.isCritical ? Color(0xFFE8192C) : Color(0xFFFF6D00);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false, // back button is disabled on this page
+      child: Scaffold(
+        backgroundColor: Color(0xFF0D0D0D),
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(22),
+            child: Column(
+              children: [
+
+                // top row with type badge and cancel button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    // type badge
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: mainColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: mainColor.withOpacity(0.4)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(color: mainColor, shape: BoxShape.circle),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            widget.isCritical ? "CRITICAL" : "STANDARD",
+                            style: TextStyle(color: mainColor, fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // cancel button - only show if driver not found yet
+                    if (!driverWasFound)
+                      TextButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Color(0xFF1A1A1A),
+                              title: Text("Cancel Emergency?", style: TextStyle(color: Colors.white)),
+                              content: Text("Are you sure?", style: TextStyle(color: Color(0xFF888888))),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("No", style: TextStyle(color: Color(0xFF888888))),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Navigator.popUntil(context, (route) => route.isFirst);
+                                  },
+                                  child: Text("Yes Cancel", style: TextStyle(color: Color(0xFFE8192C))),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        child: Text("Cancel", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+                      ),
+
+                  ],
+                ),
+
+                SizedBox(height: 36),
+
+                // show pulsing circle OR green check based on driverWasFound
+                if (!driverWasFound) ...[
+
+                  ScaleTransition(
+                    scale: pulseAnim,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 160,
+                          height: 160,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: mainColor.withOpacity(0.07),
+                          ),
+                        ),
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: mainColor.withOpacity(0.13),
+                          ),
+                        ),
+                        Container(
+                          width: 88,
+                          height: 88,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: mainColor,
+                          ),
+                          child: Icon(Icons.local_hospital, color: Colors.white, size: 40),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 28),
+
+                  // big timer text
+                  Text(
+                    getTimerText(),
+                    style: TextStyle(color: mainColor, fontSize: 54, fontWeight: FontWeight.w900, letterSpacing: -2),
+                  ),
+                  Text(
+                    "Searching for driver",
+                    style: TextStyle(color: Color(0xFF888888), fontSize: 13),
+                  ),
+
+                  SizedBox(height: 20),
+
+                  // progress bar
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value: 1 - (secondsLeft / 120),
+                      backgroundColor: Color(0xFF1A1A1A),
+                      valueColor: AlwaysStoppedAnimation(mainColor),
+                      minHeight: 5,
+                    ),
+                  ),
+
+                ] else ...[
+
+                  // green check icon when driver found
+                  Container(
+                    width: 92,
+                    height: 92,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF00C853).withOpacity(0.15),
+                      border: Border.all(color: Color(0xFF00C853), width: 2.5),
+                    ),
+                    child: Icon(Icons.check_rounded, color: Color(0xFF00C853), size: 48),
+                  ),
+
+                ],
+
+                SizedBox(height: 26),
+
+                // status box
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Color(0xFF2A2A2A)),
+                  ),
+                  child: Column(
+                    children: [
+
+                      Text(
+                        statusMessage,
+                        style: TextStyle(
+                          color: driverWasFound ? Color(0xFF00C853) : mainColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      // show driver info when found
+                      if (driverWasFound) ...[
+                        SizedBox(height: 16),
+                        Divider(color: Color(0xFF2A2A2A)),
+                        SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: Color(0xFF00C853).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(11),
+                              ),
+                              child: Icon(Icons.local_taxi, color: Color(0xFF00C853), size: 22),
+                            ),
+                            SizedBox(width: 14),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(driverName, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                                Text("Driver is on the way", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        MyRedButton(
+                          text: "Back to Home",
+                          buttonColor: Color(0xFF00C853),
+                          onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
+                        ),
+                      ],
+
+                    ],
+                  ),
+                ),
+
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// DRIVER HOME PAGE
+// has 2 tabs - Home and Profile
+// ==========================================
+class DriverHomePage extends StatefulWidget {
+  @override
+  State<DriverHomePage> createState() => _DriverHomePageState();
+}
+
+class _DriverHomePageState extends State<DriverHomePage> {
+
+  int activeTab = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: activeTab == 0 ? DriverHomeTab() : DriverProfileTab(),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Color(0xFF1A1A1A),
+        currentIndex: activeTab,
+        onTap: (tappedIndex) {
+          setState(() { activeTab = tappedIndex; });
+        },
+        selectedItemColor: Color(0xFFE8192C),
+        unselectedItemColor: Color(0xFF888888),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),  label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "Profile"),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// DRIVER HOME TAB
+// driver can go online or offline
+// when online fake request appears after 4 sec
+// all data comes from fakeEmergencyRequest
+// ==========================================
+class DriverHomeTab extends StatefulWidget {
+  @override
+  State<DriverHomeTab> createState() => _DriverHomeTabState();
+}
+
+class _DriverHomeTabState extends State<DriverHomeTab> {
+
+  bool amIOnline      = false;
+  bool showingRequest = false;
+  bool isAccepting    = false;
+
+  void tapGoOnline() {
+    setState(() { amIOnline = true; });
+
+    // show a fake request after 4 seconds
+    Future.delayed(Duration(seconds: 4), () {
+      if (mounted && amIOnline) {
+        setState(() { showingRequest = true; });
+      }
+    });
+  }
+
+  void tapGoOffline() {
+    setState(() {
+      amIOnline      = false;
+      showingRequest = false;
+    });
+  }
+
+  void tapAccept() async {
+
+    setState(() { isAccepting = true; });
+
+    // pretend we are calling the server for 1 second
+    await Future.delayed(Duration(seconds: 1));
+
+    if (!mounted) return;
+    setState(() {
+      showingRequest = false;
+      isAccepting    = false;
+    });
+
+    // go to the trip page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DriverTripPage(
+          emergencyId : fakeEmergencyRequest["emergency_id"],
+          patientName : fakeEmergencyRequest["patient_name"],
+          location    : fakeEmergencyRequest["location"],
+          isCritical  : fakeEmergencyRequest["emergency_type"] == "Critical",
+        ),
+      ),
+    );
+  }
+
+  void tapDecline() {
+    setState(() { showingRequest = false; });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              // top row with title and online/offline button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Driver Dashboard",
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+
+                  GestureDetector(
+                    onTap: amIOnline ? tapGoOffline : tapGoOnline,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: amIOnline ? Color(0xFF00C853).withOpacity(0.15) : Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: amIOnline ? Color(0xFF00C853).withOpacity(0.4) : Color(0xFF333333),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: amIOnline ? Color(0xFF00C853) : Color(0xFF888888),
+                            ),
+                          ),
+                          SizedBox(width: 7),
+                          Text(
+                            amIOnline ? "Online" : "Offline",
+                            style: TextStyle(
+                              color: amIOnline ? Color(0xFF00C853) : Color(0xFF888888),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              ),
+
+              SizedBox(height: 22),
+
+              // show the incoming request card when there is one
+              if (showingRequest && amIOnline) ...[
+
+                Container(
+                  padding: EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Color(0xFFE8192C).withOpacity(0.6), width: 1.5),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFE8192C),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text("NEW REQUEST", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900)),
+                          ),
+                          Spacer(),
+                          Text(
+                            fakeEmergencyRequest["distance"],
+                            style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 14),
+
+                      Text(
+                        fakeEmergencyRequest["emergency_type"] + " Emergency",
+                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+
+                      SizedBox(height: 5),
+
+                      Row(
+                        children: [
+                          Icon(Icons.location_on_outlined, color: Color(0xFF888888), size: 15),
+                          SizedBox(width: 5),
+                          Text(
+                            fakeEmergencyRequest["location"],
+                            style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 16),
+
+                      // accept and decline buttons
+                      Row(
+                        children: [
+
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: isAccepting ? null : tapAccept,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 13),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFE8192C),
+                                  borderRadius: BorderRadius.circular(11),
+                                ),
+                                child: Center(
+                                  child: isAccepting
+                                      ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                      : Text("Accept", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(width: 10),
+
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: tapDecline,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 13),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF1A1A1A),
+                                  borderRadius: BorderRadius.circular(11),
+                                  border: Border.all(color: Color(0xFF333333)),
+                                ),
+                                child: Center(
+                                  child: Text("Decline", style: TextStyle(color: Color(0xFF888888), fontWeight: FontWeight.w600)),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 20),
+
+              ],
+
+              // show offline message
+              if (!amIOnline) ...[
+
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Color(0xFF2A2A2A)),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(Icons.wifi_off, color: Color(0xFF888888), size: 34),
+                      SizedBox(height: 10),
+                      Text("You are Offline", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                      SizedBox(height: 4),
+                      Text("Tap Online button to receive requests", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 20),
+
+              ],
+
+              // stats from fakeDriverStats
+              Text("Today Stats", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              SizedBox(height: 12),
+
+              Row(
+                children: [
+                  buildStatBox("Trips",    fakeDriverStats["trips"]!,    Color(0xFF00C853), Icons.check_circle_outline),
+                  SizedBox(width: 12),
+                  buildStatBox("Distance", fakeDriverStats["distance"]!, Color(0xFFFF6D00), Icons.route_outlined),
+                  SizedBox(width: 12),
+                  buildStatBox("Rating",   fakeDriverStats["rating"]!,   Color(0xFF7B61FF), Icons.star_outline),
+                ],
+              ),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildStatBox(String label, String value, Color color, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: color, size: 19),
+            SizedBox(height: 8),
+            Text(value, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w900)),
+            Text(label, style: TextStyle(color: Color(0xFF888888), fontSize: 11)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// DRIVER TRIP PAGE
+// after accepting the request
+// driver picks hospital from fakeHospitalsList
+// patient info comes from fakeEmergencyRequest
+// no api call needed here - all fake data
+// ==========================================
+class DriverTripPage extends StatefulWidget {
+  String emergencyId;
+  String patientName;
+  String location;
+  bool   isCritical;
+
+  DriverTripPage({
+    required this.emergencyId,
+    required this.patientName,
+    required this.location,
+    required this.isCritical,
+  });
+
+  @override
+  State<DriverTripPage> createState() => _DriverTripPageState();
+}
+
+class _DriverTripPageState extends State<DriverTripPage> {
+
+  String? pickedHospitalId;
+  String? pickedHospitalName;
+  bool isSending   = false;
+  bool sentAlready = false;
+
+  void tapSendToHospital() async {
+
+    if (pickedHospitalId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select a hospital first"),
+          backgroundColor: Color(0xFFB5001F),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      return;
+    }
+
+    setState(() { isSending = true; });
+
+    // pretend we are sending to server
+    await Future.delayed(Duration(seconds: 2));
+
+    if (!mounted) return;
+    setState(() {
+      isSending   = false;
+      sentAlready = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF0D0D0D),
+        title: Text("Active Trip", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        automaticallyImplyLeading: false,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            // show success message after sending
+            if (sentAlready) ...[
+
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Color(0xFF00C853).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Color(0xFF00C853).withOpacity(0.4), width: 1.5),
+                ),
+                child: Column(
+                  children: [
+                    Icon(Icons.check_circle, color: Color(0xFF00C853), size: 48),
+                    SizedBox(height: 12),
+                    Text("Hospital Notified!", style: TextStyle(color: Color(0xFF00C853), fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 6),
+                    Text(
+                      "$pickedHospitalName is ready for the patient",
+                      style: TextStyle(color: Color(0xFF888888), fontSize: 13),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              MyRedButton(
+                text: "Done - Back to Home",
+                buttonColor: Color(0xFF00C853),
+                onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
+              ),
+
+            ] else ...[
+
+              // patient info card from fakeEmergencyRequest
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Color(0xFF1A1A1A),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Color(0xFF2A2A2A)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: widget.isCritical ? Color(0xFFE8192C) : Color(0xFFFF6D00),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            widget.isCritical ? "CRITICAL" : "STANDARD",
+                            style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text("Emergency #${widget.emergencyId}", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    buildPatientRow(Icons.person_outline,         "Patient",    widget.patientName),
+                    SizedBox(height: 8),
+                    buildPatientRow(Icons.location_on_outlined,   "Pickup",     widget.location),
+                    SizedBox(height: 8),
+                    buildPatientRow(Icons.bloodtype_outlined,     "Blood",      fakeEmergencyRequest["blood_group"]),
+                    SizedBox(height: 8),
+                    buildPatientRow(Icons.sick_outlined,          "Diseases",   fakeEmergencyRequest["existing_diseases"]),
+                    SizedBox(height: 8),
+                    buildPatientRow(Icons.warning_amber_outlined, "Allergies",  fakeEmergencyRequest["allergies"]),
+                    SizedBox(height: 8),
+                    buildPatientRow(Icons.note_outlined,          "Reports",    fakeEmergencyRequest["reports_notes"]),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 24),
+
+              Text("Select Hospital", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              SizedBox(height: 6),
+              Text("Where are you taking the patient?", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+              SizedBox(height: 14),
+
+              // hospital list from fakeHospitalsList
+              Column(
+                children: fakeHospitalsList.map((hospital) {
+
+                  bool isThisSelected = pickedHospitalId == hospital["id"];
+
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          pickedHospitalId   = hospital["id"];
+                          pickedHospitalName = hospital["name"];
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: isThisSelected ? Color(0xFFE8192C).withOpacity(0.12) : Color(0xFF1A1A1A),
+                          borderRadius: BorderRadius.circular(13),
+                          border: Border.all(
+                            color: isThisSelected ? Color(0xFFE8192C) : Color(0xFF2A2A2A),
+                            width: isThisSelected ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: isThisSelected ? Color(0xFFE8192C).withOpacity(0.2) : Color(0xFF242424),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                Icons.local_hospital_outlined,
+                                color: isThisSelected ? Color(0xFFE8192C) : Color(0xFF888888),
+                                size: 20,
+                              ),
+                            ),
+                            SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(hospital["name"]!, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                                  Text(hospital["distance"]! + " away", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                            if (isThisSelected)
+                              Icon(Icons.check_circle, color: Color(0xFFE8192C), size: 20),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+
+                }).toList(),
+              ),
+
+              SizedBox(height: 20),
+
+              MyRedButton(
+                text: isSending ? "Sending..." : "Notify Hospital and Send Patient Data",
+                onTap: tapSendToHospital,
+                isLoading: isSending,
+              ),
+
+              SizedBox(height: 20),
+
+            ],
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildPatientRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: Color(0xFF888888), size: 16),
+        SizedBox(width: 10),
+        Text("$label: ", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+        Expanded(
+          child: Text(value, style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
+        ),
+      ],
+    );
+  }
+}
+
+// ==========================================
+// DRIVER PROFILE TAB
+// shows name and logout button
+// ==========================================
+class DriverProfileTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("My Profile", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              SizedBox(height: 26),
+              Center(
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF1A1A1A),
+                    border: Border.all(color: Color(0xFFE8192C), width: 2.5),
+                  ),
+                  child: Icon(Icons.person, color: Color(0xFF888888), size: 46),
+                ),
+              ),
+              SizedBox(height: 10),
+              Center(child: Text(myName.isNotEmpty ? myName : "Driver", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold))),
+              Center(child: Text("Driver", style: TextStyle(color: Color(0xFF888888), fontSize: 13))),
+              Spacer(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                },
+                child: Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE8192C).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Color(0xFFE8192C).withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Color(0xFFE8192C), size: 20),
+                      SizedBox(width: 12),
+                      Text("Logout", style: TextStyle(color: Color(0xFFE8192C), fontWeight: FontWeight.bold)),
+                      Spacer(),
+                      Icon(Icons.arrow_forward_ios, color: Color(0xFFE8192C), size: 13),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// HOSPITAL HOME PAGE
+// has 3 tabs - Home, Patients, Profile
+// ==========================================
+class HospitalHomePage extends StatefulWidget {
+  @override
+  State<HospitalHomePage> createState() => _HospitalHomePageState();
+}
+
+class _HospitalHomePageState extends State<HospitalHomePage> {
+
+  int activeTab = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: [
+        HospitalHomeTab(),
+        HospitalPatientsTab(),
+        HospitalProfileTab(),
+      ][activeTab],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Color(0xFF1A1A1A),
+        currentIndex: activeTab,
+        onTap: (tappedIndex) {
+          setState(() { activeTab = tappedIndex; });
+        },
+        selectedItemColor: Color(0xFFE8192C),
+        unselectedItemColor: Color(0xFF888888),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),   label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.people_outline),  label: "Patients"),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline),  label: "Profile"),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// HOSPITAL HOME TAB
+// shows stats from fakeHospitalStats
+// shows recent requests from fakeRecentRequests
+// ==========================================
+class HospitalHomeTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Text("Hospital Dashboard", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              SizedBox(height: 20),
+
+              // stats row 1
+              Row(
+                children: [
+                  buildHospStat("Active",    fakeHospitalStats["active_requests"]!, Color(0xFFE8192C), Icons.emergency_outlined),
+                  SizedBox(width: 12),
+                  buildHospStat("Drivers",   fakeHospitalStats["drivers_online"]!,  Color(0xFF00C853), Icons.local_taxi_outlined),
+                ],
+              ),
+
+              SizedBox(height: 12),
+
+              // stats row 2
+              Row(
+                children: [
+                  buildHospStat("Today",    fakeHospitalStats["trips_today"]!,  Color(0xFFFF6D00), Icons.route_outlined),
+                  SizedBox(width: 12),
+                  buildHospStat("Avg Time", fakeHospitalStats["avg_response"]!, Color(0xFF7B61FF), Icons.timer_outlined),
+                ],
+              ),
+
+              SizedBox(height: 24),
+
+              Text("Recent Requests", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              SizedBox(height: 12),
+
+              // list of recent requests from fakeRecentRequests
+              Column(
+                children: fakeRecentRequests.map((req) {
+
+                  Color reqColor = req["status"] == "Active"
+                      ? Color(0xFFE8192C)
+                      : req["status"] == "En Route"
+                          ? Color(0xFFFF6D00)
+                          : Color(0xFF00C853);
+
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: Container(
+                      padding: EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Color(0xFF2A2A2A)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: reqColor.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: Icon(
+                              req["type"] == "Critical" ? Icons.warning_rounded : Icons.local_hospital_outlined,
+                              color: reqColor,
+                              size: 19,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(req["name"]!, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
+                                Text("${req["type"]}  •  ${req["time"]}", style: TextStyle(color: Color(0xFF888888), fontSize: 11)),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: reqColor.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(req["status"]!, style: TextStyle(color: reqColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+
+                }).toList(),
+              ),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildHospStat(String label, String value, Color color, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: color, size: 19),
+            SizedBox(height: 8),
+            Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.w900)),
+            Text(label, style: TextStyle(color: Color(0xFF888888), fontSize: 11)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// HOSPITAL PATIENTS TAB
+// shows incoming patient cards
+// data comes from fakePatientsList
+// ==========================================
+class HospitalPatientsTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            Padding(
+              padding: EdgeInsets.all(22),
+              child: Text(
+                "Incoming Patients",
+                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 22),
+                itemCount: fakePatientsList.length,
+                itemBuilder: (context, index) {
+
+                  var patient = fakePatientsList[index];
+                  bool isCritical = patient["emergency_type"] == "critical";
+                  Color patientColor = isCritical ? Color(0xFFE8192C) : Color(0xFFFF6D00);
+
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: patientColor.withOpacity(0.35), width: 1.5),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          // patient card header
+                          Container(
+                            padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: patientColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  isCritical ? Icons.warning_rounded : Icons.local_hospital_outlined,
+                                  color: patientColor,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  patient["patient_name"],
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                ),
+                                Spacer(),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: patientColor.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    isCritical ? "CRITICAL" : "STANDARD",
+                                    style: TextStyle(color: patientColor, fontSize: 10, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // patient details
+                          Padding(
+                            padding: EdgeInsets.all(15),
+                            child: Column(
+                              children: [
+                                buildPatRow(Icons.bloodtype_outlined,     "Blood Group",       patient["blood_group"]),
+                                SizedBox(height: 8),
+                                buildPatRow(Icons.sick_outlined,          "Existing Diseases", patient["existing_diseases"]),
+                                SizedBox(height: 8),
+                                buildPatRow(Icons.warning_amber_outlined, "Allergies",         patient["allergies"]),
+                                SizedBox(height: 8),
+                                buildPatRow(Icons.note_outlined,          "Reports",           patient["reports_notes"]),
+                                SizedBox(height: 8),
+                                buildPatRow(Icons.location_on_outlined,   "Pickup From",       patient["pickup_location"]),
+                                SizedBox(height: 8),
+                                buildPatRow(Icons.local_taxi_outlined,    "Driver",            patient["driver_name"]),
+                                SizedBox(height: 8),
+                                buildPatRow(Icons.access_time_outlined,   "Arrival",           patient["arrival_time"]),
+                              ],
+                            ),
+                          ),
+
+                          // status badge at bottom
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFF00C853).withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    patient["status"],
+                                    style: TextStyle(color: Color(0xFF00C853), fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Text("ID: #${patient["id"]}", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                              ],
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  );
+
+                },
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildPatRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: Color(0xFF888888), size: 15),
+        SizedBox(width: 9),
+        Text("$label:  ", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+        Expanded(
+          child: Text(value, style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
+        ),
+      ],
+    );
+  }
+}
+
+// ==========================================
+// HOSPITAL PROFILE TAB
+// shows name and logout button
+// ==========================================
+class HospitalProfileTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Hospital Profile", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              SizedBox(height: 26),
+              Center(
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF1A1A1A),
+                    border: Border.all(color: Color(0xFFE8192C), width: 2.5),
+                  ),
+                  child: Icon(Icons.local_hospital, color: Color(0xFF888888), size: 44),
+                ),
+              ),
+              SizedBox(height: 10),
+              Center(child: Text(myName.isNotEmpty ? myName : "Hospital", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold))),
+              Center(child: Text("Hospital", style: TextStyle(color: Color(0xFF888888), fontSize: 13))),
+              Spacer(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                },
+                child: Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE8192C).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Color(0xFFE8192C).withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Color(0xFFE8192C), size: 20),
+                      SizedBox(width: 12),
+                      Text("Logout", style: TextStyle(color: Color(0xFFE8192C), fontWeight: FontWeight.bold)),
+                      Spacer(),
+                      Icon(Icons.arrow_forward_ios, color: Color(0xFFE8192C), size: 13),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+</pre>
 <div class="site-header">
   <div class="header-eyebrow">Flutter × PHP — Full Stack Docs</div>
   <h1>Registration Page<br><em>Complete Documentation</em></h1>
