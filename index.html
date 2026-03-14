@@ -6,395 +6,13 @@
 <title>Registration Page — Full Docs</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #f5f0e8;
-  --paper: #fffdf7;
-  --dark: #1a1208;
-  --red: #d42b2b;
-  --red-soft: #f5e0e0;
-  --orange: #e06c00;
-  --orange-soft: #fef3e2;
-  --green: #1a6b3a;
-  --green-soft: #e2f5eb;
-  --blue: #1a4d8f;
-  --blue-soft: #e2edf5;
-  --purple: #5b2d8f;
-  --purple-soft: #ede2f5;
-  --muted: #7a6e5f;
-  --border: #ddd5c0;
-  --code-bg: #1a1208;
-  --mono: 'IBM Plex Mono', monospace;
-  --serif: 'Fraunces', serif;
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--dark);
-  font-family: var(--serif);
-  font-size: 15px;
-  line-height: 1.7;
-}
-
-/* ── HEADER ── */
-.site-header {
-  background: var(--red);
-  padding: 50px 48px 40px;
-  position: relative;
-  overflow: hidden;
-}
-.site-header::after {
-  content: '';
-  position: absolute;
-  bottom: -1px; left: 0; right: 0;
-  height: 40px;
-  background: var(--bg);
-  border-radius: 40px 40px 0 0;
-}
-.header-eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: rgba(255,255,255,0.6);
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-.site-header h1 {
-  font-size: clamp(28px,5vw,52px);
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.05;
-  max-width: 600px;
-}
-.site-header h1 em { font-style: italic; color: #ffc9c9; }
-.header-sub {
-  color: rgba(255,255,255,0.75);
-  margin-top: 12px;
-  font-size: 15px;
-  max-width: 520px;
-}
-.header-pills {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  margin-top: 20px;
-}
-.pill {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-
-/* ── LAYOUT ── */
-.layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  min-height: 100vh;
-  gap: 0;
-}
-
-/* ── SIDEBAR ── */
-aside {
-  background: var(--paper);
-  border-right: 1px solid var(--border);
-  padding: 32px 0;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-}
-aside::-webkit-scrollbar { width: 3px; }
-aside::-webkit-scrollbar-thumb { background: var(--border); }
-
-.nav-group-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 16px 24px 6px;
-}
-.nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 9px 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--serif);
-  font-size: 13px;
-  color: var(--muted);
-  text-align: left;
-  transition: all .15s;
-  border-left: 3px solid transparent;
-}
-.nav-btn:hover { background: var(--bg); color: var(--dark); }
-.nav-btn.active {
-  color: var(--red);
-  border-left-color: var(--red);
-  background: var(--red-soft);
-  font-weight: 700;
-}
-.nav-num {
-  font-family: var(--mono);
-  font-size: 10px;
-  background: var(--border);
-  color: var(--muted);
-  padding: 1px 6px;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-.nav-btn.active .nav-num { background: var(--red); color: #fff; }
-
-/* ── MAIN ── */
-main {
-  padding: 48px 56px;
-  max-width: 860px;
-}
-
-/* ── SECTION ── */
-.section { display: none; animation: fadeIn .25s ease; }
-.section.active { display: block; }
-@keyframes fadeIn {
-  from { opacity:0; transform: translateY(8px); }
-  to   { opacity:1; transform: translateY(0); }
-}
-
-/* ── CHUNK ── */
-.chunk {
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  margin-bottom: 32px;
-  overflow: hidden;
-}
-.chunk-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  user-select: none;
-  transition: background .15s;
-}
-.chunk-header:hover { background: var(--bg); }
-.chunk-num {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--red);
-  background: var(--red-soft);
-  border: 1px solid #f5c0c0;
-  padding: 3px 9px;
-  border-radius: 4px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.chunk-title { font-size: 17px; font-weight: 700; line-height: 1.3; }
-.chunk-sub { font-size: 12px; color: var(--muted); margin-top: 3px; font-family: var(--mono); }
-.chunk-toggle { margin-left: auto; font-size: 22px; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
-.chunk-header.open .chunk-toggle { transform: rotate(45deg); color: var(--red); }
-
-.chunk-body { display: none; padding: 28px 24px; }
-.chunk-body.open { display: block; }
-
-/* ── CODE ── */
-.code-wrap {
-  background: var(--code-bg);
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 16px 0;
-  position: relative;
-}
-.code-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #6b5c3e;
-  padding: 8px 16px;
-  border-bottom: 1px solid #2e2010;
-}
-.code-wrap pre {
-  padding: 20px;
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 1.9;
-  overflow-x: auto;
-  white-space: pre;
-}
-.copy-btn {
-  position: absolute;
-  top: 36px; right: 12px;
-  background: #2e2010;
-  border: 1px solid #4a3820;
-  color: #a89070;
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.copy-btn:hover { background: var(--red); color: #fff; border-color: var(--red); }
-
-/* syntax */
-.kw    { color: #ff6b6b; }
-.cls   { color: #ffd93d; }
-.fn    { color: #6bcb77; }
-.str   { color: #ffa94d; }
-.num   { color: #74c0fc; }
-.cmt   { color: #4a3820; font-style: italic; }
-.prop  { color: #f8c291; }
-.type  { color: #cc99ff; }
-.php-kw { color: #ff8fab; }
-.php-fn { color: #a9e34b; }
-.php-str { color: #ffd8a8; }
-.php-var { color: #74c0fc; }
-.php-cmt { color: #4a3820; font-style: italic; }
-
-/* ── EXPLAIN LINES ── */
-.explain-block { margin: 20px 0; }
-.explain-block h4 {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
-.eline {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 12px;
-  padding: 11px 14px;
-  border-radius: 8px;
-  border-left: 3px solid var(--border);
-  margin: 6px 0;
-  transition: border-color .15s;
-  background: var(--bg);
-}
-.eline:hover { border-left-color: var(--red); }
-.eline-code {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--orange);
-  word-break: break-all;
-  padding-top: 2px;
-}
-.eline-text { font-size: 13px; line-height: 1.55; }
-.eline-text strong { color: var(--red); font-weight: 700; }
-.eline-text .adv {
-  display: inline-block;
-  margin-top: 5px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--purple);
-  background: var(--purple-soft);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-/* ── CALLOUT ── */
-.callout {
-  display: flex; gap: 14px;
-  padding: 16px 18px;
-  border-radius: 10px;
-  margin: 16px 0;
-  font-size: 13px;
-  line-height: 1.6;
-}
-.c-red    { background: var(--red-soft);    border: 1px solid #f5c0c0; }
-.c-orange { background: var(--orange-soft); border: 1px solid #fdd9a0; }
-.c-green  { background: var(--green-soft);  border: 1px solid #a8dfc0; }
-.c-blue   { background: var(--blue-soft);   border: 1px solid #a8c8e8; }
-.callout-icon { font-size: 20px; flex-shrink: 0; }
-.callout strong { font-weight: 700; }
-
-/* ── TABLE ── */
-.ptable { width:100%; border-collapse:collapse; margin: 14px 0; font-size: 13px; }
-.ptable th {
-  background: var(--dark);
-  color: var(--bg);
-  padding: 9px 14px;
-  text-align: left;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.ptable td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
-.ptable tr:hover td { background: var(--bg); }
-.ptable td:first-child { font-family: var(--mono); font-size: 12px; color: var(--orange); }
-
-/* ── SECTION TITLE ── */
-.sec-title {
-  font-size: clamp(22px,3vw,34px);
-  font-weight: 900;
-  margin-bottom: 6px;
-  line-height: 1.1;
-}
-.sec-title span { color: var(--red); font-style: italic; }
-.sec-desc { color: var(--muted); font-size: 14px; margin-bottom: 36px; max-width: 560px; }
-
-h3.sub {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 24px 0 10px;
-}
-
-/* ── NOOB / ADV BADGE ── */
-.badge-noob { display:inline-block; background:#e2f5eb; color:#1a6b3a; font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:4px; margin-right:6px; }
-.badge-adv  { display:inline-block; background:#ede2f5; color:#5b2d8f; font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:4px; }
-
-/* ── FLOW ── */
-.flow { display:flex; flex-direction:column; gap:3px; margin:14px 0; }
-.flow-item {
-  display:flex; align-items:center; gap:10px;
-  padding: 10px 16px;
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-family: var(--mono);
-  font-size: 12px;
-}
-.flow-arr { color:var(--muted); padding-left:18px; font-size:18px; }
-
-/* ── PHP SECTION TAG ── */
-.php-tag {
-  display:inline-block;
-  background:#4f2b9e;
-  color:#fff;
-  font-family:var(--mono);
-  font-size:11px;
-  padding:3px 10px;
-  border-radius:4px;
-  margin-left:8px;
-}
-
-@media(max-width:720px){
-  .layout { grid-template-columns:1fr; }
-  aside { display:none; }
-  main { padding:24px 20px; }
-}
-</style>
 </head>
 <body>
 <pre>
-  import 'dart:convert';
+ import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 
 void main() {
   runApp(MyApp());
@@ -411,23 +29,19 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Color(0xFF0D0D0D),
         primaryColor: Color(0xFFE8192C),
       ),
-      home: LoginPage(), 
+      home: LoginPage(),
     );
   }
 }
 
-String serverUrl    = "http://192.168.33.1:80/MCA_HACK_BACKEND";
-String loginUrl     = "http://192.168.33.1/MCA_HACK_BACKEND/u_login.php";    // REAL PHP API
-String registerUrl  = "http://192.168.33.1/MCA_HACK_BACKEND/register.php"; // REAL PHP API
-
+String loginUrl    = "http://192.168.33.1/MCA_HACK_BACKEND/u_login.php";
+String registerUrl = "http://192.168.33.1/MCA_HACK_BACKEND/register.php";
 
 String myName     = "";
 String myUserId   = "";
 String myUserType = "";
 
-
-// fake data for the user dashboard
-Map<String, dynamic> fakeUserData = {
+Map fakeUserData = {
   "name"             : "Aarav Sharma",
   "email"            : "aarav@example.com",
   "phone"            : "+91 98765 43210",
@@ -437,7 +51,6 @@ Map<String, dynamic> fakeUserData = {
   "reports_notes"    : "Regular checkup done in Jan 2025",
 };
 
-// fake data for the hospital patients list
 List<Map<String, dynamic>> fakePatientsList = [
   {
     "id"               : "101",
@@ -467,9 +80,7 @@ List<Map<String, dynamic>> fakePatientsList = [
   },
 ];
 
-// fake data for the incoming emergency request
-// the driver sees this when they go online
-Map<String, dynamic> fakeEmergencyRequest = {
+Map fakeEmergencyRequest = {
   "emergency_id"     : "101",
   "patient_name"     : "Aarav Sharma",
   "emergency_type"   : "Critical",
@@ -481,7 +92,6 @@ Map<String, dynamic> fakeEmergencyRequest = {
   "reports_notes"    : "Chest pain since 2 hours",
 };
 
-// fake list of hospitals the driver can choose from
 List<Map<String, String>> fakeHospitalsList = [
   {"id": "1", "name": "City General Hospital", "distance": "1.2 km"},
   {"id": "2", "name": "Apollo Hospital",        "distance": "2.5 km"},
@@ -489,19 +99,17 @@ List<Map<String, String>> fakeHospitalsList = [
   {"id": "4", "name": "Sterling Hospital",      "distance": "4.0 km"},
 ];
 
-// fake hospital stats for the dashboard
-Map<String, dynamic> fakeHospitalStats = {
+Map fakeHospitalStats = {
   "active_requests" : "3",
   "drivers_online"  : "7",
   "trips_today"     : "14",
   "avg_response"    : "4.2m",
 };
 
-// fake recent requests for hospital
 List<Map<String, String>> fakeRecentRequests = [
-  {"name": "Raj Kumar",  "type": "Critical", "time": "2 min ago",  "status": "Active"},
-  {"name": "Priya M.",   "type": "Standard", "time": "8 min ago",  "status": "En Route"},
-  {"name": "Suresh V.",  "type": "Standard", "time": "22 min ago", "status": "Done"},
+  {"name": "Raj Kumar", "type": "Critical", "time": "2 min ago",  "status": "Active"},
+  {"name": "Priya M.",  "type": "Standard", "time": "8 min ago",  "status": "En Route"},
+  {"name": "Suresh V.", "type": "Standard", "time": "22 min ago", "status": "Done"},
 ];
 
 Map<String, String> fakeDriverStats = {
@@ -509,7 +117,6 @@ Map<String, String> fakeDriverStats = {
   "distance" : "38 km",
   "rating"   : "4.8",
 };
-
 
 class MyBox extends StatefulWidget {
   String label;
@@ -577,10 +184,6 @@ class _MyBoxState extends State<MyBox> {
   }
 }
 
-// ==========================================
-// STEP 7 - A SIMPLE RED BUTTON WIDGET
-// we use this everywhere for buttons
-// ==========================================
 class MyRedButton extends StatelessWidget {
   String text;
   VoidCallback? onTap;
@@ -629,105 +232,83 @@ class MyRedButton extends StatelessWidget {
   }
 }
 
-// ==========================================
-// LOGIN PAGE
-// this calls the REAL PHP login api
-// ==========================================
 class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-
-  // these hold what the user types
   TextEditingController usernameBox = TextEditingController();
   TextEditingController passwordBox = TextEditingController();
-
-  // this shows the spinning circle
   bool isLoading = false;
 
-  // this function runs when you tap Login
   void tapLogin() async {
-
-    // check if boxes are empty
     if (usernameBox.text.trim().isEmpty) {
-      showRedMessage("Please type your username");
+      showMessage("Please type your username");
       return;
     }
     if (passwordBox.text.isEmpty) {
-      showRedMessage("Please type your password");
+      showMessage("Please type your password");
       return;
     }
 
-    // show the spinning circle
     setState(() {
       isLoading = true;
     });
 
-    // ---- REAL PHP API CALL ----
-    // we send username and password to the server
-    // the server checks if it is correct
     try {
-      var serverResponse = await http.post(
+      var response = await http.post(
         Uri.parse(loginUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "username": usernameBox.text.trim(),
           "password": passwordBox.text,
         }),
-      );
+      ).timeout(Duration(seconds: 10));
 
-      
-      var responseData = jsonDecode(serverResponse.body);
+      var data = jsonDecode(response.body);
 
-      if (serverResponse.statusCode == 200) {
+      if (response.statusCode == 200) {
         myName     = usernameBox.text.trim();
-        myUserId   = responseData["user_id"].toString();
-        myUserType = responseData["user_type"].toString();
-        if (responseData["user_type"] == "User") {
+        myUserId   = data["user_id"].toString();
+        myUserType = data["user_type"].toString();
+
+        if (data["user_type"] == "User") {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => UserHomePage()),
           );
-
-        } else if (responseData["user_type"] == "Hospital") {
+        } else if (data["user_type"] == "Hospital") {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => HospitalHomePage()),
           );
-
-        } else if (responseData["user_type"] == "Driver") {
+        } else if (data["user_type"] == "Driver") {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => DriverHomePage()),
           );
-
         } else {
-          showRedMessage("Unknown user type from server");
+          showMessage("Unknown user type");
         }
-
       } else {
-        // login failed
-        showRedMessage(responseData["message"] ?? "Login failed. Try again.");
+        showMessage(data["message"] ?? "Login failed");
       }
-
-    } catch (error) {
-      // cant reach server
-      showRedMessage("Cannot connect to server. Check wifi.");
+    } on TimeoutException {
+      showMessage("Server is taking too long. Check if server is running.");
+    } catch (e) {
+      showMessage("Cannot reach server. Check your IP and wifi. Error: $e");
     }
 
-    // hide the spinning circle
     setState(() {
       isLoading = false;
     });
   }
 
-  // this shows a red message at the bottom of the screen
-  void showRedMessage(String message) {
+  void showMessage(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(msg),
         backgroundColor: Color(0xFFB5001F),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -740,8 +321,6 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Stack(
         children: [
-
-          // decorative circle in top right corner
           Positioned(
             top: -60,
             right: -60,
@@ -754,18 +333,13 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-
-          // the actual content
           SafeArea(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(26),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   SizedBox(height: 40),
-
-                  // app logo box
                   Container(
                     width: 60,
                     height: 60,
@@ -775,10 +349,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Icon(Icons.local_hospital, color: Colors.white, size: 30),
                   ),
-
                   SizedBox(height: 20),
-
-                  // app name
                   Text(
                     "RapidAid",
                     style: TextStyle(
@@ -788,52 +359,40 @@ class _LoginPageState extends State<LoginPage> {
                       letterSpacing: -1,
                     ),
                   ),
-
                   SizedBox(height: 4),
-
                   Text(
                     "Emergency ambulance service",
                     style: TextStyle(color: Color(0xFF888888), fontSize: 14),
                   ),
-
                   SizedBox(height: 44),
-
                   Text(
                     "Sign In",
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-
                   SizedBox(height: 18),
-
-                  // username box
                   MyBox(
                     label: "Username",
                     controller: usernameBox,
                     icon: Icons.person_outline,
                   ),
-
                   SizedBox(height: 14),
-
-                  // password box
                   MyBox(
                     label: "Password",
                     controller: passwordBox,
                     isPassword: true,
                     icon: Icons.lock_outline,
                   ),
-
                   SizedBox(height: 24),
-
-                  // login button
                   MyRedButton(
                     text: "Login",
                     onTap: tapLogin,
                     isLoading: isLoading,
                   ),
-
                   SizedBox(height: 18),
-
-                  // go to signup
                   Center(
                     child: GestureDetector(
                       onTap: () {
@@ -859,7 +418,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
@@ -870,53 +428,38 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// ==========================================
-// SIGNUP PAGE
-// this calls the REAL PHP register api
-// ==========================================
 class SignupPage extends StatefulWidget {
   @override
   State<SignupPage> createState() => _SignupPageState();
 }
 
 class _SignupPageState extends State<SignupPage> {
-
-  // text boxes for common fields
-  TextEditingController nameBox     = TextEditingController();
-  TextEditingController emailBox    = TextEditingController();
-  TextEditingController phoneBox    = TextEditingController();
-  TextEditingController passwordBox = TextEditingController();
-
-  // extra boxes for driver
-  TextEditingController licenseBox = TextEditingController();
-  TextEditingController vehicleBox = TextEditingController();
-
-  // extra boxes for hospital
-  TextEditingController hospNameBox    = TextEditingController();
-  TextEditingController imrBox         = TextEditingController();
+  TextEditingController nameBox         = TextEditingController();
+  TextEditingController emailBox        = TextEditingController();
+  TextEditingController phoneBox        = TextEditingController();
+  TextEditingController passwordBox     = TextEditingController();
+  TextEditingController licenseBox      = TextEditingController();
+  TextEditingController vehicleBox      = TextEditingController();
+  TextEditingController hospNameBox     = TextEditingController();
+  TextEditingController imrBox          = TextEditingController();
   TextEditingController hospLocationBox = TextEditingController();
-  TextEditingController hospContactBox = TextEditingController();
+  TextEditingController hospContactBox  = TextEditingController();
 
-  // which type is selected  0=User  1=Driver  2=Hospital
   int selectedType = 0;
   List<String> typeNames = ["User", "Driver", "Hospital"];
-
   bool isLoading = false;
 
-  // this runs when you tap Create Account
   void tapSignup() async {
-
-    // check if basic boxes are empty
     if (nameBox.text.trim().isEmpty ||
         emailBox.text.trim().isEmpty ||
         phoneBox.text.trim().isEmpty ||
         passwordBox.text.isEmpty) {
-      showRedMessage("Please fill all the fields");
+      showMessage("Please fill all the fields");
       return;
     }
 
     if (passwordBox.text.length < 6) {
-      showRedMessage("Password must be at least 6 characters");
+      showMessage("Password must be at least 6 characters");
       return;
     }
 
@@ -924,7 +467,6 @@ class _SignupPageState extends State<SignupPage> {
       isLoading = true;
     });
 
-    // build the data we want to send
     Map<String, String> dataToSend = {
       "name"      : nameBox.text.trim(),
       "email"     : emailBox.text.trim(),
@@ -933,13 +475,11 @@ class _SignupPageState extends State<SignupPage> {
       "user_type" : typeNames[selectedType],
     };
 
-    // add driver extra fields
     if (selectedType == 1) {
       dataToSend["license_no"] = licenseBox.text.trim();
       dataToSend["vehicle_no"] = vehicleBox.text.trim();
     }
 
-    // add hospital extra fields
     if (selectedType == 2) {
       dataToSend["hospital_name"] = hospNameBox.text.trim();
       dataToSend["imr_no"]        = imrBox.text.trim();
@@ -947,18 +487,16 @@ class _SignupPageState extends State<SignupPage> {
       dataToSend["contact_no"]    = hospContactBox.text.trim();
     }
 
-    // ---- REAL PHP API CALL ----
     try {
-      var serverResponse = await http.post(
+      var response = await http.post(
         Uri.parse(registerUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(dataToSend),
-      );
+      ).timeout(Duration(seconds: 10));
 
-      var responseData = jsonDecode(serverResponse.body);
+      var data = jsonDecode(response.body);
 
-      if (serverResponse.statusCode == 200 || serverResponse.statusCode == 201) {
-        // account created!
+      if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Account created! Please login now."),
@@ -967,14 +505,14 @@ class _SignupPageState extends State<SignupPage> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         );
-        Navigator.pop(context); // go back to login page
-
+        Navigator.pop(context);
       } else {
-        showRedMessage(responseData["message"] ?? "Registration failed. Try again.");
+        showMessage(data["message"] ?? "Registration failed. Try again.");
       }
-
-    } catch (error) {
-      showRedMessage("Cannot connect to server. Check wifi.");
+    } on TimeoutException {
+      showMessage("Server is taking too long. Check if server is running.");
+    } catch (e) {
+      showMessage("Cannot reach server. Error: $e");
     }
 
     setState(() {
@@ -982,10 +520,10 @@ class _SignupPageState extends State<SignupPage> {
     });
   }
 
-  void showRedMessage(String message) {
+  void showMessage(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(msg),
         backgroundColor: Color(0xFFB5001F),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -998,7 +536,10 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF0D0D0D),
-        title: Text("Create Account", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        title: Text(
+          "Create Account",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => Navigator.pop(context),
@@ -1009,18 +550,17 @@ class _SignupPageState extends State<SignupPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // select type row
             Text("I am a...", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
             SizedBox(height: 10),
-
             Row(
               children: [
-
-                // User button
                 Expanded(
                   child: GestureDetector(
-                    onTap: () { setState(() { selectedType = 0; }); },
+                    onTap: () {
+                      setState(() {
+                        selectedType = 0;
+                      });
+                    },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 11),
                       margin: EdgeInsets.only(right: 8),
@@ -1043,11 +583,13 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                 ),
-
-                // Driver button
                 Expanded(
                   child: GestureDetector(
-                    onTap: () { setState(() { selectedType = 1; }); },
+                    onTap: () {
+                      setState(() {
+                        selectedType = 1;
+                      });
+                    },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 11),
                       margin: EdgeInsets.only(right: 8),
@@ -1070,11 +612,13 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                 ),
-
-                // Hospital button
                 Expanded(
                   child: GestureDetector(
-                    onTap: () { setState(() { selectedType = 2; }); },
+                    onTap: () {
+                      setState(() {
+                        selectedType = 2;
+                      });
+                    },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 11),
                       decoration: BoxDecoration(
@@ -1096,30 +640,22 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                 ),
-
               ],
             ),
-
             SizedBox(height: 22),
-
-            // common fields everyone needs
-            MyBox(label: "Full Name",     controller: nameBox,     icon: Icons.person_outline),
+            MyBox(label: "Full Name",    controller: nameBox,     icon: Icons.person_outline),
             SizedBox(height: 13),
-            MyBox(label: "Email",         controller: emailBox,    icon: Icons.email_outlined),
+            MyBox(label: "Email",        controller: emailBox,    icon: Icons.email_outlined),
             SizedBox(height: 13),
-            MyBox(label: "Phone Number",  controller: phoneBox,    icon: Icons.phone_outlined),
+            MyBox(label: "Phone Number", controller: phoneBox,    icon: Icons.phone_outlined),
             SizedBox(height: 13),
-            MyBox(label: "Password",      controller: passwordBox, icon: Icons.lock_outline, isPassword: true),
-
-            // show these only if Driver is selected
+            MyBox(label: "Password",     controller: passwordBox, icon: Icons.lock_outline, isPassword: true),
             if (selectedType == 1) ...[
               SizedBox(height: 13),
               MyBox(label: "License Number", controller: licenseBox, icon: Icons.badge_outlined),
               SizedBox(height: 13),
               MyBox(label: "Vehicle Number", controller: vehicleBox, icon: Icons.local_shipping_outlined),
             ],
-
-            // show these only if Hospital is selected
             if (selectedType == 2) ...[
               SizedBox(height: 13),
               MyBox(label: "Hospital Name",     controller: hospNameBox,     icon: Icons.local_hospital_outlined),
@@ -1130,18 +666,13 @@ class _SignupPageState extends State<SignupPage> {
               SizedBox(height: 13),
               MyBox(label: "Contact Number",    controller: hospContactBox,  icon: Icons.phone_outlined),
             ],
-
             SizedBox(height: 28),
-
-            // create account button
             MyRedButton(
               text: "Create Account",
               onTap: tapSignup,
               isLoading: isLoading,
             ),
-
             SizedBox(height: 20),
-
           ],
         ),
       ),
@@ -1149,26 +680,18 @@ class _SignupPageState extends State<SignupPage> {
   }
 }
 
-// ==========================================
-// USER HOME PAGE
-// has 2 tabs - Home and Profile
-// ==========================================
 class UserHomePage extends StatefulWidget {
   @override
   State<UserHomePage> createState() => _UserHomePageState();
 }
 
 class _UserHomePageState extends State<UserHomePage> {
-
-  int activeTab = 0; // 0 = home tab  1 = profile tab
+  int activeTab = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      // show home or profile based on activeTab
       body: activeTab == 0 ? UserHomeTab() : UserProfileTab(),
-
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color(0xFF1A1A1A),
         currentIndex: activeTab,
@@ -1180,19 +703,14 @@ class _UserHomePageState extends State<UserHomePage> {
         selectedItemColor: Color(0xFFE8192C),
         unselectedItemColor: Color(0xFF888888),
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),   label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline),  label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),  label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "Profile"),
         ],
       ),
     );
   }
 }
 
-// ==========================================
-// USER HOME TAB
-// shows the call ambulance button
-// uses fakeUserData for the greeting
-// ==========================================
 class UserHomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1204,8 +722,6 @@ class UserHomeTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              // greeting row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1218,7 +734,11 @@ class UserHomeTab extends StatelessWidget {
                       ),
                       Text(
                         myName.isNotEmpty ? myName : fakeUserData["name"],
-                        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -1234,10 +754,7 @@ class UserHomeTab extends StatelessWidget {
                   ),
                 ],
               ),
-
               SizedBox(height: 26),
-
-              // big red call ambulance card
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(20),
@@ -1302,23 +819,17 @@ class UserHomeTab extends StatelessWidget {
                   ],
                 ),
               ),
-
               SizedBox(height: 24),
-
-              // how it works section
               Text(
                 "How It Works",
                 style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
               ),
-
               SizedBox(height: 14),
-
-              buildStep("Step 1", "Choose emergency type",     Icons.touch_app_outlined),
+              buildStep("Step 1", "Choose emergency type",      Icons.touch_app_outlined),
               SizedBox(height: 10),
-              buildStep("Step 2", "Confirm your request",      Icons.check_circle_outline),
+              buildStep("Step 2", "Confirm your request",       Icons.check_circle_outline),
               SizedBox(height: 10),
               buildStep("Step 3", "Nearest driver is assigned", Icons.local_taxi_outlined),
-
             ],
           ),
         ),
@@ -1326,7 +837,6 @@ class UserHomeTab extends StatelessWidget {
     );
   }
 
-  // helper to build one step card
   Widget buildStep(String stepTitle, String description, IconData icon) {
     return Container(
       padding: EdgeInsets.all(14),
@@ -1351,8 +861,14 @@ class UserHomeTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(stepTitle,   style: TextStyle(color: Color(0xFFE8192C), fontSize: 11, fontWeight: FontWeight.bold)),
-                Text(description, style: TextStyle(color: Colors.white, fontSize: 13)),
+                Text(
+                  stepTitle,
+                  style: TextStyle(color: Color(0xFFE8192C), fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  description,
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
               ],
             ),
           ),
@@ -1361,7 +877,6 @@ class UserHomeTab extends StatelessWidget {
     );
   }
 }
-
 
 class UserProfileTab extends StatelessWidget {
   @override
@@ -1374,15 +889,11 @@ class UserProfileTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Text(
                 "My Profile",
                 style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
               ),
-
               SizedBox(height: 26),
-
-              // profile picture circle
               Center(
                 child: Container(
                   width: 90,
@@ -1395,7 +906,6 @@ class UserProfileTab extends StatelessWidget {
                   child: Icon(Icons.person, color: Color(0xFF888888), size: 46),
                 ),
               ),
-
               SizedBox(height: 10),
               Center(
                 child: Text(
@@ -1406,42 +916,38 @@ class UserProfileTab extends StatelessWidget {
               Center(
                 child: Text("User", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
               ),
-
               SizedBox(height: 26),
-
-              Text("Personal Details", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              Text(
+                "Personal Details",
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 14),
-
-              buildInfoRow(Icons.person_outline,  "Name",  fakeUserData["name"]),
+              buildInfoRow(Icons.person_outline, "Name",  fakeUserData["name"]),
               SizedBox(height: 10),
               buildInfoRow(Icons.email_outlined,  "Email", fakeUserData["email"]),
               SizedBox(height: 10),
               buildInfoRow(Icons.phone_outlined,  "Phone", fakeUserData["phone"]),
-
               SizedBox(height: 26),
-
-              Text("Medical Information", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              Text(
+                "Medical Information",
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 4),
               Text(
                 "This info is shared with the hospital when you call ambulance",
                 style: TextStyle(color: Color(0xFF888888), fontSize: 12),
               ),
               SizedBox(height: 14),
-
-              buildInfoRow(Icons.bloodtype_outlined,      "Blood Group",       fakeUserData["blood_group"]),
+              buildInfoRow(Icons.bloodtype_outlined,     "Blood Group",       fakeUserData["blood_group"]),
               SizedBox(height: 10),
-              buildInfoRow(Icons.sick_outlined,           "Existing Diseases", fakeUserData["existing_diseases"]),
+              buildInfoRow(Icons.sick_outlined,          "Existing Diseases", fakeUserData["existing_diseases"]),
               SizedBox(height: 10),
-              buildInfoRow(Icons.warning_amber_outlined,  "Allergies",         fakeUserData["allergies"]),
+              buildInfoRow(Icons.warning_amber_outlined, "Allergies",         fakeUserData["allergies"]),
               SizedBox(height: 10),
-              buildInfoRow(Icons.note_outlined,           "Reports / Notes",   fakeUserData["reports_notes"]),
-
+              buildInfoRow(Icons.note_outlined,          "Reports / Notes",   fakeUserData["reports_notes"]),
               SizedBox(height: 28),
-
               Divider(color: Color(0xFF2A2A2A)),
               SizedBox(height: 14),
-
-              // logout button
               GestureDetector(
                 onTap: () {
                   Navigator.pushReplacement(
@@ -1460,16 +966,17 @@ class UserProfileTab extends StatelessWidget {
                     children: [
                       Icon(Icons.logout, color: Color(0xFFE8192C), size: 20),
                       SizedBox(width: 12),
-                      Text("Logout", style: TextStyle(color: Color(0xFFE8192C), fontWeight: FontWeight.bold)),
+                      Text(
+                        "Logout",
+                        style: TextStyle(color: Color(0xFFE8192C), fontWeight: FontWeight.bold),
+                      ),
                       Spacer(),
                       Icon(Icons.arrow_forward_ios, color: Color(0xFFE8192C), size: 13),
                     ],
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
-
             ],
           ),
         ),
@@ -1477,7 +984,6 @@ class UserProfileTab extends StatelessWidget {
     );
   }
 
-  // helper to show one info row
   Widget buildInfoRow(IconData icon, String label, String value) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 13),
@@ -1506,11 +1012,6 @@ class UserProfileTab extends StatelessWidget {
   }
 }
 
-// ==========================================
-// CHOOSE EMERGENCY PAGE
-// user picks critical or standard
-// uses no api - just navigates
-// ==========================================
 class ChooseEmergencyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1518,7 +1019,10 @@ class ChooseEmergencyPage extends StatelessWidget {
       backgroundColor: Color(0xFF0D0D0D),
       appBar: AppBar(
         backgroundColor: Color(0xFF0D0D0D),
-        title: Text("Request Ambulance", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        title: Text(
+          "Request Ambulance",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => Navigator.pop(context),
@@ -1529,7 +1033,6 @@ class ChooseEmergencyPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Text(
               "Select Emergency Type",
               style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
@@ -1539,10 +1042,7 @@ class ChooseEmergencyPage extends StatelessWidget {
               "How serious is the emergency?",
               style: TextStyle(color: Color(0xFF888888), fontSize: 13),
             ),
-
             SizedBox(height: 32),
-
-            // Critical card
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -1558,10 +1058,7 @@ class ChooseEmergencyPage extends StatelessWidget {
                 eta: "ETA < 5 min",
               ),
             ),
-
             SizedBox(height: 16),
-
-            // Standard card
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -1577,10 +1074,7 @@ class ChooseEmergencyPage extends StatelessWidget {
                 eta: "ETA < 15 min",
               ),
             ),
-
             Spacer(),
-
-            // info box at bottom
             Container(
               padding: EdgeInsets.all(15),
               decoration: BoxDecoration(
@@ -1601,7 +1095,6 @@ class ChooseEmergencyPage extends StatelessWidget {
                 ],
               ),
             ),
-
           ],
         ),
       ),
@@ -1638,9 +1131,15 @@ class ChooseEmergencyPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                Text(
+                  title,
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                ),
                 SizedBox(height: 4),
-                Text(description, style: TextStyle(color: Color(0xFF888888), fontSize: 12, height: 1.4)),
+                Text(
+                  description,
+                  style: TextStyle(color: Color(0xFF888888), fontSize: 12, height: 1.4),
+                ),
               ],
             ),
           ),
@@ -1652,7 +1151,10 @@ class ChooseEmergencyPage extends StatelessWidget {
                   color: cardColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(7),
                 ),
-                child: Text(eta, style: TextStyle(color: cardColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                child: Text(
+                  eta,
+                  style: TextStyle(color: cardColor, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
               ),
               SizedBox(height: 8),
               Icon(Icons.arrow_forward_ios, color: Color(0xFF888888), size: 13),
@@ -1664,26 +1166,23 @@ class ChooseEmergencyPage extends StatelessWidget {
   }
 }
 
-// ==========================================
-// CONFIRM EMERGENCY PAGE
-// shows summary before sending
-// uses fakeUserData for patient details
-// ==========================================
 class ConfirmEmergencyPage extends StatelessWidget {
   bool isCritical;
   ConfirmEmergencyPage({required this.isCritical});
 
   @override
   Widget build(BuildContext context) {
-
-    Color theColor = isCritical ? Color(0xFFE8192C) : Color(0xFFFF6D00);
+    Color theColor  = isCritical ? Color(0xFFE8192C) : Color(0xFFFF6D00);
     String theLabel = isCritical ? "Critical Emergency" : "Standard Ambulance";
 
     return Scaffold(
       backgroundColor: Color(0xFF0D0D0D),
       appBar: AppBar(
         backgroundColor: Color(0xFF0D0D0D),
-        title: Text("Confirm Request", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        title: Text(
+          "Confirm Request",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => Navigator.pop(context),
@@ -1693,8 +1192,6 @@ class ConfirmEmergencyPage extends StatelessWidget {
         padding: EdgeInsets.all(22),
         child: Column(
           children: [
-
-            // type card at top
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(18),
@@ -1711,7 +1208,10 @@ class ConfirmEmergencyPage extends StatelessWidget {
                     size: 44,
                   ),
                   SizedBox(height: 10),
-                  Text(theLabel, style: TextStyle(color: theColor, fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                    theLabel,
+                    style: TextStyle(color: theColor, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   SizedBox(height: 6),
                   Text(
                     isCritical
@@ -1723,20 +1223,15 @@ class ConfirmEmergencyPage extends StatelessWidget {
                 ],
               ),
             ),
-
             SizedBox(height: 22),
-
-            buildDetailRow(Icons.location_on_outlined, "Location", "Detected from your phone"),
+            buildDetailRow(Icons.location_on_outlined, "Location",     "Detected from your phone"),
             SizedBox(height: 10),
             buildDetailRow(Icons.bloodtype_outlined,   "Blood Group",  fakeUserData["blood_group"]),
             SizedBox(height: 10),
             buildDetailRow(Icons.sick_outlined,        "Diseases",     fakeUserData["existing_diseases"]),
             SizedBox(height: 10),
             buildDetailRow(Icons.timer_outlined,       "Expected ETA", isCritical ? "Less than 5 minutes" : "Less than 15 minutes"),
-
             Spacer(),
-
-            // confirm button
             MyRedButton(
               text: "Yes, Send Emergency Request",
               buttonColor: theColor,
@@ -1749,10 +1244,7 @@ class ConfirmEmergencyPage extends StatelessWidget {
                 );
               },
             ),
-
             SizedBox(height: 12),
-
-            // cancel button
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -1765,7 +1257,6 @@ class ConfirmEmergencyPage extends StatelessWidget {
                 child: Text("Cancel", style: TextStyle(color: Color(0xFF888888))),
               ),
             ),
-
           ],
         ),
       ),
@@ -1799,12 +1290,6 @@ class ConfirmEmergencyPage extends StatelessWidget {
   }
 }
 
-// ==========================================
-// EMERGENCY WAITING PAGE
-// shows spinning animation + 2 min timer
-// uses fake data to simulate driver found
-// no api calls here - all fake
-// ==========================================
 class EmergencyWaitingPage extends StatefulWidget {
   bool isCritical;
   EmergencyWaitingPage({required this.isCritical});
@@ -1813,33 +1298,27 @@ class EmergencyWaitingPage extends StatefulWidget {
   State<EmergencyWaitingPage> createState() => _EmergencyWaitingPageState();
 }
 
-class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with SingleTickerProviderStateMixin {
-
-  int secondsLeft = 120;
+class _EmergencyWaitingPageState extends State<EmergencyWaitingPage>
+    with SingleTickerProviderStateMixin {
+  int    secondsLeft    = 120;
   Timer? myTimer;
-  String statusMessage = "Sending emergency request...";
-  bool driverWasFound = false;
-  String driverName = "";
+  String statusMessage  = "Sending emergency request...";
+  bool   driverWasFound = false;
+  String driverName     = "";
 
   late AnimationController pulseCtrl;
-  late Animation<double> pulseAnim;
+  late Animation<double>   pulseAnim;
 
   @override
   void initState() {
     super.initState();
-
-    // setup the pulsing animation
     pulseCtrl = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 900),
     );
     pulseCtrl.repeat(reverse: true);
     pulseAnim = Tween<double>(begin: 0.92, end: 1.08).animate(pulseCtrl);
-
-    // start the countdown timer
     startTimer();
-
-    // simulate finding a driver after 6 seconds
     simulateFindingDriver();
   }
 
@@ -1857,21 +1336,21 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
   }
 
   void simulateFindingDriver() async {
-    // wait 2 seconds then show searching message
     await Future.delayed(Duration(seconds: 2));
     if (!mounted) return;
-    setState(() { statusMessage = "Notifying nearby drivers..."; });
+    setState(() {
+      statusMessage = "Notifying nearby drivers...";
+    });
 
-    // wait 3 more seconds then show expanding message
     await Future.delayed(Duration(seconds: 3));
     if (!mounted) return;
-    setState(() { statusMessage = "Round 1: Looking for drivers within 2km..."; });
+    setState(() {
+      statusMessage = "Round 1: Looking for drivers within 2km...";
+    });
 
-    // wait 4 more seconds then driver is found!
     await Future.delayed(Duration(seconds: 4));
     if (!mounted) return;
 
-    // driver found! use fake data
     myTimer?.cancel();
     pulseCtrl.stop();
     setState(() {
@@ -1888,13 +1367,10 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
     super.dispose();
   }
 
-  // turns 75 seconds into "01:15" format
   String getTimerText() {
     int minutes = secondsLeft ~/ 60;
-    int seconds = secondsLeft % 60;
-    String mText = minutes.toString().padLeft(2, "0");
-    String sText = seconds.toString().padLeft(2, "0");
-    return "$mText:$sText";
+    int seconds  = secondsLeft % 60;
+    return "${minutes.toString().padLeft(2, "0")}:${seconds.toString().padLeft(2, "0")}";
   }
 
   Color get mainColor => widget.isCritical ? Color(0xFFE8192C) : Color(0xFFFF6D00);
@@ -1902,7 +1378,7 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // back button is disabled on this page
+      canPop: false,
       child: Scaffold(
         backgroundColor: Color(0xFF0D0D0D),
         body: SafeArea(
@@ -1910,13 +1386,9 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
             padding: EdgeInsets.all(22),
             child: Column(
               children: [
-
-                // top row with type badge and cancel button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
-                    // type badge
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
@@ -1939,8 +1411,6 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                         ],
                       ),
                     ),
-
-                    // cancel button - only show if driver not found yet
                     if (!driverWasFound)
                       TextButton(
                         onPressed: () {
@@ -1968,15 +1438,10 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                         },
                         child: Text("Cancel", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
                       ),
-
                   ],
                 ),
-
                 SizedBox(height: 36),
-
-                // show pulsing circle OR green check based on driverWasFound
                 if (!driverWasFound) ...[
-
                   ScaleTransition(
                     scale: pulseAnim,
                     child: Stack(
@@ -2010,10 +1475,7 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                       ],
                     ),
                   ),
-
                   SizedBox(height: 28),
-
-                  // big timer text
                   Text(
                     getTimerText(),
                     style: TextStyle(color: mainColor, fontSize: 54, fontWeight: FontWeight.w900, letterSpacing: -2),
@@ -2022,10 +1484,7 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                     "Searching for driver",
                     style: TextStyle(color: Color(0xFF888888), fontSize: 13),
                   ),
-
                   SizedBox(height: 20),
-
-                  // progress bar
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
                     child: LinearProgressIndicator(
@@ -2035,10 +1494,7 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                       minHeight: 5,
                     ),
                   ),
-
                 ] else ...[
-
-                  // green check icon when driver found
                   Container(
                     width: 92,
                     height: 92,
@@ -2049,12 +1505,8 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                     ),
                     child: Icon(Icons.check_rounded, color: Color(0xFF00C853), size: 48),
                   ),
-
                 ],
-
                 SizedBox(height: 26),
-
-                // status box
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(18),
@@ -2065,7 +1517,6 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                   ),
                   child: Column(
                     children: [
-
                       Text(
                         statusMessage,
                         style: TextStyle(
@@ -2075,8 +1526,6 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                         ),
                         textAlign: TextAlign.center,
                       ),
-
-                      // show driver info when found
                       if (driverWasFound) ...[
                         SizedBox(height: 16),
                         Divider(color: Color(0xFF2A2A2A)),
@@ -2096,8 +1545,14 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(driverName, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                                Text("Driver is on the way", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                                Text(
+                                  driverName,
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                ),
+                                Text(
+                                  "Driver is on the way",
+                                  style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+                                ),
                               ],
                             ),
                           ],
@@ -2109,11 +1564,9 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
                           onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
                         ),
                       ],
-
                     ],
                   ),
                 ),
-
               ],
             ),
           ),
@@ -2123,17 +1576,12 @@ class _EmergencyWaitingPageState extends State<EmergencyWaitingPage> with Single
   }
 }
 
-// ==========================================
-// DRIVER HOME PAGE
-// has 2 tabs - Home and Profile
-// ==========================================
 class DriverHomePage extends StatefulWidget {
   @override
   State<DriverHomePage> createState() => _DriverHomePageState();
 }
 
 class _DriverHomePageState extends State<DriverHomePage> {
-
   int activeTab = 0;
 
   @override
@@ -2144,7 +1592,9 @@ class _DriverHomePageState extends State<DriverHomePage> {
         backgroundColor: Color(0xFF1A1A1A),
         currentIndex: activeTab,
         onTap: (tappedIndex) {
-          setState(() { activeTab = tappedIndex; });
+          setState(() {
+            activeTab = tappedIndex;
+          });
         },
         selectedItemColor: Color(0xFFE8192C),
         unselectedItemColor: Color(0xFF888888),
@@ -2157,30 +1607,25 @@ class _DriverHomePageState extends State<DriverHomePage> {
   }
 }
 
-// ==========================================
-// DRIVER HOME TAB
-// driver can go online or offline
-// when online fake request appears after 4 sec
-// all data comes from fakeEmergencyRequest
-// ==========================================
 class DriverHomeTab extends StatefulWidget {
   @override
   State<DriverHomeTab> createState() => _DriverHomeTabState();
 }
 
 class _DriverHomeTabState extends State<DriverHomeTab> {
-
   bool amIOnline      = false;
   bool showingRequest = false;
   bool isAccepting    = false;
 
   void tapGoOnline() {
-    setState(() { amIOnline = true; });
-
-    // show a fake request after 4 seconds
+    setState(() {
+      amIOnline = true;
+    });
     Future.delayed(Duration(seconds: 4), () {
       if (mounted && amIOnline) {
-        setState(() { showingRequest = true; });
+        setState(() {
+          showingRequest = true;
+        });
       }
     });
   }
@@ -2193,19 +1638,15 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
   }
 
   void tapAccept() async {
-
-    setState(() { isAccepting = true; });
-
-    // pretend we are calling the server for 1 second
+    setState(() {
+      isAccepting = true;
+    });
     await Future.delayed(Duration(seconds: 1));
-
     if (!mounted) return;
     setState(() {
       showingRequest = false;
       isAccepting    = false;
     });
-
-    // go to the trip page
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -2220,7 +1661,9 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
   }
 
   void tapDecline() {
-    setState(() { showingRequest = false; });
+    setState(() {
+      showingRequest = false;
+    });
   }
 
   @override
@@ -2233,8 +1676,6 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              // top row with title and online/offline button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -2242,7 +1683,6 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                     "Driver Dashboard",
                     style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-
                   GestureDetector(
                     onTap: amIOnline ? tapGoOffline : tapGoOnline,
                     child: Container(
@@ -2277,15 +1717,10 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                       ),
                     ),
                   ),
-
                 ],
               ),
-
               SizedBox(height: 22),
-
-              // show the incoming request card when there is one
               if (showingRequest && amIOnline) ...[
-
                 Container(
                   padding: EdgeInsets.all(18),
                   decoration: BoxDecoration(
@@ -2296,7 +1731,6 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Row(
                         children: [
                           Container(
@@ -2305,7 +1739,10 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                               color: Color(0xFFE8192C),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text("NEW REQUEST", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900)),
+                            child: Text(
+                              "NEW REQUEST",
+                              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900),
+                            ),
                           ),
                           Spacer(),
                           Text(
@@ -2314,16 +1751,12 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                           ),
                         ],
                       ),
-
                       SizedBox(height: 14),
-
                       Text(
                         fakeEmergencyRequest["emergency_type"] + " Emergency",
                         style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-
                       SizedBox(height: 5),
-
                       Row(
                         children: [
                           Icon(Icons.location_on_outlined, color: Color(0xFF888888), size: 15),
@@ -2334,13 +1767,9 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                           ),
                         ],
                       ),
-
                       SizedBox(height: 16),
-
-                      // accept and decline buttons
                       Row(
                         children: [
-
                           Expanded(
                             child: GestureDetector(
                               onTap: isAccepting ? null : tapAccept,
@@ -2352,15 +1781,20 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                                 ),
                                 child: Center(
                                   child: isAccepting
-                                      ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                      : Text("Accept", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                      ? SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                        )
+                                      : Text(
+                                          "Accept",
+                                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                        ),
                                 ),
                               ),
                             ),
                           ),
-
                           SizedBox(width: 10),
-
                           Expanded(
                             child: GestureDetector(
                               onTap: tapDecline,
@@ -2372,26 +1806,22 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                                   border: Border.all(color: Color(0xFF333333)),
                                 ),
                                 child: Center(
-                                  child: Text("Decline", style: TextStyle(color: Color(0xFF888888), fontWeight: FontWeight.w600)),
+                                  child: Text(
+                                    "Decline",
+                                    style: TextStyle(color: Color(0xFF888888), fontWeight: FontWeight.w600),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-
                         ],
                       ),
-
                     ],
                   ),
                 ),
-
                 SizedBox(height: 20),
-
               ],
-
-              // show offline message
               if (!amIOnline) ...[
-
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(20),
@@ -2404,21 +1834,25 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                     children: [
                       Icon(Icons.wifi_off, color: Color(0xFF888888), size: 34),
                       SizedBox(height: 10),
-                      Text("You are Offline", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                      Text(
+                        "You are Offline",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
                       SizedBox(height: 4),
-                      Text("Tap Online button to receive requests", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                      Text(
+                        "Tap Online button to receive requests",
+                        style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+                      ),
                     ],
                   ),
                 ),
-
                 SizedBox(height: 20),
-
               ],
-
-              // stats from fakeDriverStats
-              Text("Today Stats", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              Text(
+                "Today Stats",
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 12),
-
               Row(
                 children: [
                   buildStatBox("Trips",    fakeDriverStats["trips"]!,    Color(0xFF00C853), Icons.check_circle_outline),
@@ -2428,7 +1862,6 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
                   buildStatBox("Rating",   fakeDriverStats["rating"]!,   Color(0xFF7B61FF), Icons.star_outline),
                 ],
               ),
-
             ],
           ),
         ),
@@ -2459,13 +1892,6 @@ class _DriverHomeTabState extends State<DriverHomeTab> {
   }
 }
 
-// ==========================================
-// DRIVER TRIP PAGE
-// after accepting the request
-// driver picks hospital from fakeHospitalsList
-// patient info comes from fakeEmergencyRequest
-// no api call needed here - all fake data
-// ==========================================
 class DriverTripPage extends StatefulWidget {
   String emergencyId;
   String patientName;
@@ -2484,14 +1910,12 @@ class DriverTripPage extends StatefulWidget {
 }
 
 class _DriverTripPageState extends State<DriverTripPage> {
-
   String? pickedHospitalId;
   String? pickedHospitalName;
   bool isSending   = false;
   bool sentAlready = false;
 
   void tapSendToHospital() async {
-
     if (pickedHospitalId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -2504,9 +1928,10 @@ class _DriverTripPageState extends State<DriverTripPage> {
       return;
     }
 
-    setState(() { isSending = true; });
+    setState(() {
+      isSending = true;
+    });
 
-    // pretend we are sending to server
     await Future.delayed(Duration(seconds: 2));
 
     if (!mounted) return;
@@ -2530,10 +1955,7 @@ class _DriverTripPageState extends State<DriverTripPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // show success message after sending
             if (sentAlready) ...[
-
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(20),
@@ -2546,7 +1968,10 @@ class _DriverTripPageState extends State<DriverTripPage> {
                   children: [
                     Icon(Icons.check_circle, color: Color(0xFF00C853), size: 48),
                     SizedBox(height: 12),
-                    Text("Hospital Notified!", style: TextStyle(color: Color(0xFF00C853), fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      "Hospital Notified!",
+                      style: TextStyle(color: Color(0xFF00C853), fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                     SizedBox(height: 6),
                     Text(
                       "$pickedHospitalName is ready for the patient",
@@ -2556,18 +1981,13 @@ class _DriverTripPageState extends State<DriverTripPage> {
                   ],
                 ),
               ),
-
               SizedBox(height: 20),
-
               MyRedButton(
                 text: "Done - Back to Home",
                 buttonColor: Color(0xFF00C853),
                 onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
               ),
-
             ] else ...[
-
-              // patient info card from fakeEmergencyRequest
               Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -2592,38 +2012,41 @@ class _DriverTripPageState extends State<DriverTripPage> {
                           ),
                         ),
                         SizedBox(width: 10),
-                        Text("Emergency #${widget.emergencyId}", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                        Text(
+                          "Emergency #${widget.emergencyId}",
+                          style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+                        ),
                       ],
                     ),
                     SizedBox(height: 12),
-                    buildPatientRow(Icons.person_outline,         "Patient",    widget.patientName),
+                    buildPatientRow(Icons.person_outline,         "Patient",   widget.patientName),
                     SizedBox(height: 8),
-                    buildPatientRow(Icons.location_on_outlined,   "Pickup",     widget.location),
+                    buildPatientRow(Icons.location_on_outlined,   "Pickup",    widget.location),
                     SizedBox(height: 8),
-                    buildPatientRow(Icons.bloodtype_outlined,     "Blood",      fakeEmergencyRequest["blood_group"]),
+                    buildPatientRow(Icons.bloodtype_outlined,     "Blood",     fakeEmergencyRequest["blood_group"]),
                     SizedBox(height: 8),
-                    buildPatientRow(Icons.sick_outlined,          "Diseases",   fakeEmergencyRequest["existing_diseases"]),
+                    buildPatientRow(Icons.sick_outlined,          "Diseases",  fakeEmergencyRequest["existing_diseases"]),
                     SizedBox(height: 8),
-                    buildPatientRow(Icons.warning_amber_outlined, "Allergies",  fakeEmergencyRequest["allergies"]),
+                    buildPatientRow(Icons.warning_amber_outlined, "Allergies", fakeEmergencyRequest["allergies"]),
                     SizedBox(height: 8),
-                    buildPatientRow(Icons.note_outlined,          "Reports",    fakeEmergencyRequest["reports_notes"]),
+                    buildPatientRow(Icons.note_outlined,          "Reports",   fakeEmergencyRequest["reports_notes"]),
                   ],
                 ),
               ),
-
               SizedBox(height: 24),
-
-              Text("Select Hospital", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              Text(
+                "Select Hospital",
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 6),
-              Text("Where are you taking the patient?", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+              Text(
+                "Where are you taking the patient?",
+                style: TextStyle(color: Color(0xFF888888), fontSize: 13),
+              ),
               SizedBox(height: 14),
-
-              // hospital list from fakeHospitalsList
               Column(
                 children: fakeHospitalsList.map((hospital) {
-
                   bool isThisSelected = pickedHospitalId == hospital["id"];
-
                   return Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: GestureDetector(
@@ -2663,8 +2086,14 @@ class _DriverTripPageState extends State<DriverTripPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(hospital["name"]!, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
-                                  Text(hospital["distance"]! + " away", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                                  Text(
+                                    hospital["name"]!,
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+                                  ),
+                                  Text(
+                                    hospital["distance"]! + " away",
+                                    style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+                                  ),
                                 ],
                               ),
                             ),
@@ -2675,22 +2104,16 @@ class _DriverTripPageState extends State<DriverTripPage> {
                       ),
                     ),
                   );
-
                 }).toList(),
               ),
-
               SizedBox(height: 20),
-
               MyRedButton(
                 text: isSending ? "Sending..." : "Notify Hospital and Send Patient Data",
                 onTap: tapSendToHospital,
                 isLoading: isSending,
               ),
-
               SizedBox(height: 20),
-
             ],
-
           ],
         ),
       ),
@@ -2712,10 +2135,6 @@ class _DriverTripPageState extends State<DriverTripPage> {
   }
 }
 
-// ==========================================
-// DRIVER PROFILE TAB
-// shows name and logout button
-// ==========================================
 class DriverProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -2727,7 +2146,10 @@ class DriverProfileTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("My Profile", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(
+                "My Profile",
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 26),
               Center(
                 child: Container(
@@ -2742,12 +2164,22 @@ class DriverProfileTab extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              Center(child: Text(myName.isNotEmpty ? myName : "Driver", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold))),
-              Center(child: Text("Driver", style: TextStyle(color: Color(0xFF888888), fontSize: 13))),
+              Center(
+                child: Text(
+                  myName.isNotEmpty ? myName : "Driver",
+                  style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Center(
+                child: Text("Driver", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+              ),
               Spacer(),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
                 },
                 child: Container(
                   padding: EdgeInsets.all(15),
@@ -2775,17 +2207,12 @@ class DriverProfileTab extends StatelessWidget {
   }
 }
 
-// ==========================================
-// HOSPITAL HOME PAGE
-// has 3 tabs - Home, Patients, Profile
-// ==========================================
 class HospitalHomePage extends StatefulWidget {
   @override
   State<HospitalHomePage> createState() => _HospitalHomePageState();
 }
 
 class _HospitalHomePageState extends State<HospitalHomePage> {
-
   int activeTab = 0;
 
   @override
@@ -2800,25 +2227,22 @@ class _HospitalHomePageState extends State<HospitalHomePage> {
         backgroundColor: Color(0xFF1A1A1A),
         currentIndex: activeTab,
         onTap: (tappedIndex) {
-          setState(() { activeTab = tappedIndex; });
+          setState(() {
+            activeTab = tappedIndex;
+          });
         },
         selectedItemColor: Color(0xFFE8192C),
         unselectedItemColor: Color(0xFF888888),
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),   label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.people_outline),  label: "Patients"),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline),  label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),  label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: "Patients"),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "Profile"),
         ],
       ),
     );
   }
 }
 
-// ==========================================
-// HOSPITAL HOME TAB
-// shows stats from fakeHospitalStats
-// shows recent requests from fakeRecentRequests
-// ==========================================
 class HospitalHomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -2830,22 +2254,19 @@ class HospitalHomeTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              Text("Hospital Dashboard", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(
+                "Hospital Dashboard",
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 20),
-
-              // stats row 1
               Row(
                 children: [
-                  buildHospStat("Active",    fakeHospitalStats["active_requests"]!, Color(0xFFE8192C), Icons.emergency_outlined),
+                  buildHospStat("Active",  fakeHospitalStats["active_requests"]!, Color(0xFFE8192C), Icons.emergency_outlined),
                   SizedBox(width: 12),
-                  buildHospStat("Drivers",   fakeHospitalStats["drivers_online"]!,  Color(0xFF00C853), Icons.local_taxi_outlined),
+                  buildHospStat("Drivers", fakeHospitalStats["drivers_online"]!,  Color(0xFF00C853), Icons.local_taxi_outlined),
                 ],
               ),
-
               SizedBox(height: 12),
-
-              // stats row 2
               Row(
                 children: [
                   buildHospStat("Today",    fakeHospitalStats["trips_today"]!,  Color(0xFFFF6D00), Icons.route_outlined),
@@ -2853,16 +2274,14 @@ class HospitalHomeTab extends StatelessWidget {
                   buildHospStat("Avg Time", fakeHospitalStats["avg_response"]!, Color(0xFF7B61FF), Icons.timer_outlined),
                 ],
               ),
-
               SizedBox(height: 24),
-
-              Text("Recent Requests", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              Text(
+                "Recent Requests",
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 12),
-
-              // list of recent requests from fakeRecentRequests
               Column(
                 children: fakeRecentRequests.map((req) {
-
                   Color reqColor = req["status"] == "Active"
                       ? Color(0xFFE8192C)
                       : req["status"] == "En Route"
@@ -2898,8 +2317,14 @@ class HospitalHomeTab extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(req["name"]!, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
-                                Text("${req["type"]}  •  ${req["time"]}", style: TextStyle(color: Color(0xFF888888), fontSize: 11)),
+                                Text(
+                                  req["name"]!,
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                                ),
+                                Text(
+                                  "${req["type"]}  •  ${req["time"]}",
+                                  style: TextStyle(color: Color(0xFF888888), fontSize: 11),
+                                ),
                               ],
                             ),
                           ),
@@ -2909,16 +2334,17 @@ class HospitalHomeTab extends StatelessWidget {
                               color: reqColor.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text(req["status"]!, style: TextStyle(color: reqColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                            child: Text(
+                              req["status"]!,
+                              style: TextStyle(color: reqColor, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ],
                       ),
                     ),
                   );
-
                 }).toList(),
               ),
-
             ],
           ),
         ),
@@ -2949,11 +2375,6 @@ class HospitalHomeTab extends StatelessWidget {
   }
 }
 
-// ==========================================
-// HOSPITAL PATIENTS TAB
-// shows incoming patient cards
-// data comes from fakePatientsList
-// ==========================================
 class HospitalPatientsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -2963,7 +2384,6 @@ class HospitalPatientsTab extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Padding(
               padding: EdgeInsets.all(22),
               child: Text(
@@ -2971,14 +2391,12 @@ class HospitalPatientsTab extends StatelessWidget {
                 style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
-
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 22),
                 itemCount: fakePatientsList.length,
                 itemBuilder: (context, index) {
-
-                  var patient = fakePatientsList[index];
+                  var patient    = fakePatientsList[index];
                   bool isCritical = patient["emergency_type"] == "critical";
                   Color patientColor = isCritical ? Color(0xFFE8192C) : Color(0xFFFF6D00);
 
@@ -2993,14 +2411,12 @@ class HospitalPatientsTab extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
-                          // patient card header
                           Container(
                             padding: EdgeInsets.all(15),
                             decoration: BoxDecoration(
                               color: patientColor.withOpacity(0.1),
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(16),
+                                topLeft:  Radius.circular(16),
                                 topRight: Radius.circular(16),
                               ),
                             ),
@@ -3031,8 +2447,6 @@ class HospitalPatientsTab extends StatelessWidget {
                               ],
                             ),
                           ),
-
-                          // patient details
                           Padding(
                             padding: EdgeInsets.all(15),
                             child: Column(
@@ -3053,8 +2467,6 @@ class HospitalPatientsTab extends StatelessWidget {
                               ],
                             ),
                           ),
-
-                          // status badge at bottom
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                             child: Row(
@@ -3071,20 +2483,20 @@ class HospitalPatientsTab extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(width: 10),
-                                Text("ID: #${patient["id"]}", style: TextStyle(color: Color(0xFF888888), fontSize: 12)),
+                                Text(
+                                  "ID: #${patient["id"]}",
+                                  style: TextStyle(color: Color(0xFF888888), fontSize: 12),
+                                ),
                               ],
                             ),
                           ),
-
                         ],
                       ),
                     ),
                   );
-
                 },
               ),
             ),
-
           ],
         ),
       ),
@@ -3106,10 +2518,6 @@ class HospitalPatientsTab extends StatelessWidget {
   }
 }
 
-// ==========================================
-// HOSPITAL PROFILE TAB
-// shows name and logout button
-// ==========================================
 class HospitalProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -3121,7 +2529,10 @@ class HospitalProfileTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Hospital Profile", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(
+                "Hospital Profile",
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 26),
               Center(
                 child: Container(
@@ -3136,12 +2547,22 @@ class HospitalProfileTab extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              Center(child: Text(myName.isNotEmpty ? myName : "Hospital", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold))),
-              Center(child: Text("Hospital", style: TextStyle(color: Color(0xFF888888), fontSize: 13))),
+              Center(
+                child: Text(
+                  myName.isNotEmpty ? myName : "Hospital",
+                  style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Center(
+                child: Text("Hospital", style: TextStyle(color: Color(0xFF888888), fontSize: 13)),
+              ),
               Spacer(),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
                 },
                 child: Container(
                   padding: EdgeInsets.all(15),
